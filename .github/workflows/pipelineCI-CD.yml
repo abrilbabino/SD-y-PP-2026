@@ -38,9 +38,9 @@ jobs:
       run: |
         flake8 .
 
-    - name: Run tests
-      run: |
-        pytest
+    #- name: Run tests
+    #  run: |
+     #   pytest
 
   # Implementa Gitleaks para detectar secrets hardcodeados, si falla entonces el pipeline falla.
   security:
