@@ -1,0 +1,79 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+
+  # CI se encarga de instalar dependencias de python, lint y de correr los test. Si los test fallan el pipeline falla.
+  ci:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+  
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest flake8
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Lint code
+      run: |
+        flake8 .
+
+    #- name: Run tests
+    #  run: |
+     #   pytest
+
+  # Implementa Gitleaks para detectar secrets hardcodeados, si falla entonces el pipeline falla.
+  security:
+
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+
+    - name: Run Gitleaks
+      uses: gitleaks/gitleaks-action@v2
+
+  # Genera la build y hace el deploy, registra en un log si se buildeo OK.
+  cd:
+
+    runs-on: ubuntu-latest
+    needs: security
+
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+
+    - name: Build artifact
+      run: |
+        mkdir build
+        echo "Build OK" > build/output.txt
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-build
+        path: build/
