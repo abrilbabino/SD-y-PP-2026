@@ -55,6 +55,8 @@ jobs:
 
     - name: Run Gitleaks
       uses: gitleaks/gitleaks-action@v2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Genera la build y hace el deploy, registra en un log si se buildeo OK.
   cd:
