@@ -8,16 +8,18 @@ def iniciar_cliente():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((HOST, PORT))
 
-    # emvio mensaje al server
+    # envio mensaje al server
     client.sendall("Hola servidor!".encode())
 
-    #resivo la data del server
+    #recivo la data del server
     data = client.recv(1024).decode()
     print("Respuesta del servidor:", data)
 
     #cierro conexion socket - señal de fin tcp 
     client.close()
+    #devuelvo la respuesta
     return data
 
+#llamada a la funcion
 if __name__ == "__main__":
     iniciar_cliente()

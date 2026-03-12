@@ -5,11 +5,11 @@ HOST = "0.0.0.0"
 PORT = 5000
 
 def iniciar_servidor():
-#crear socket AF.INT = IPV4 --- SOCK_STREAM = TCP
+    #crear socket AF.INT = IPV4 --- SOCK_STREAM = TCP
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
     server.bind((HOST, PORT))
 
-    #COMBIERTE AL SOCKET EN SERVER TCP
+    #COMVIERTE AL SOCKET EN SERVER TCP
     server.listen()
     print("Servidor esperando conexión...")
 
