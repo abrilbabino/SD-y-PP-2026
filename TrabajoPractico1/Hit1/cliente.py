@@ -7,10 +7,10 @@ PORT = 5000
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((HOST, PORT))
 
-# emvio mensaje al server
+# envio mensaje al server
 client.sendall("Hola servidor!".encode())
 
-#resivo la data del server
+#recibo la data del server
 data = client.recv(1024).decode()
 print("Respuesta del servidor:", data)
 

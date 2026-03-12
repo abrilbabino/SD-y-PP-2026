@@ -9,7 +9,7 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server.bind((HOST, PORT))
 
-#COMBIERTE AL SOCKET EN SERVER TCP
+#CONVIERTE AL SOCKET EN SERVER TCP
 server.listen()
 print("Servidor esperando conexión...")
 
