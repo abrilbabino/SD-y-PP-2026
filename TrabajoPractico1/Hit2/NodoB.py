@@ -24,17 +24,20 @@ def start_server():
     # Bloquea el programa y cuando alguien se conecta devuelve un nuevo socket dedicado a la conexion con el cliente (conn) y la direccion del cliente (addr)
     conn, addr = NodoB.accept()
 
-    print(f"Conexion recibida desde {addr}")
+    with conn:
 
-    # el server espera que el cliente envie datos (hasta 1024 bytes) por eso se usa el decode() para convertirlos a string
-    data = conn.recv(1024).decode()
+        print(f"Conexion recibida desde {addr}")
 
-    print(f"Cliente Dice: {data}")
+        # el server espera que el cliente envie datos (hasta 1024 bytes) por eso se usa el decode() para convertirlos a string
+        data = conn.recv(1024).decode()
 
-    response = "Mensaje Recibido"
+        if data:
 
-    # Convierto el string del mensaje a bytes y lo envio
-    conn.sendall(response.encode())
+            print(f"Cliente Dice: {data}")
+            response = "Mensaje Recibido"
+
+            # Convierto el string del mensaje a bytes y lo envio
+            conn.sendall(response.encode())
 
     # cierro la conexion
     NodoB.close()

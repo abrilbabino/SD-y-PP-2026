@@ -1,15 +1,8 @@
-import socket
 import threading
 import time
-import os
-from dotenv import load_dotenv
 from ..NodoB import start_server
 from ..NodoA import start_client
 
-load_dotenv()
-
-HOST = os.getenv("HOST_SERVER_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER_TCP_TP1"))
 
 def run_server():
     start_server()
