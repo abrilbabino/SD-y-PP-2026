@@ -17,6 +17,7 @@ def start_client():
     NodoA.sendall(msg.encode())
 
     response = NodoA.recv(1024).decode()
+    print("Respuesta del servidor:", response)
 
     NodoA.close()
 

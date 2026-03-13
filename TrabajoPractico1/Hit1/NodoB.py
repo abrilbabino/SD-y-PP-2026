@@ -36,7 +36,10 @@ def start_server():
     # Convierto el string del mensaje a bytes y lo envio
     conn.sendall(response.encode())
 
-    # cierro la conexion
+    #cerrar conexion
+    conn.close()
+
+    # cierro puerto
     NodoB.close()
 
 if __name__ == "__main__":
