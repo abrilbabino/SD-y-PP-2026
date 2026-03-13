@@ -21,26 +21,25 @@ def start_server():
 
     print(f"Server (NodoB) Listening on {HOST}:{PORT} ...")
 
-    # Bloquea el programa y cuando alguien se conecta devuelve un nuevo socket dedicado a la conexion con el cliente (conn) y la direccion del cliente (addr)
-    conn, addr = NodoB.accept()
+  # Loop infinito para aceptar múltiples conexiones
+    while True:
+        conn, addr = NodoB.accept()
+        with conn:
+            print(f"Conexion recibida desde {addr}")
 
-    print(f"Conexion recibida desde {addr}")
+            while True:
+                data = conn.recv(1024).decode()
+                if not data:
+                    # si el cliente cerró la conexión, salgo del loop interno
+                    print(f"Cliente {addr} desconectado.")
+                    break
 
-    # el server espera que el cliente envie datos (hasta 1024 bytes) por eso se usa el decode() para convertirlos a string
-    data = conn.recv(1024).decode()
+                print(f"Cliente Dice: {data}")
+                response = "Mensaje Recibido"
+                conn.sendall(response.encode())
 
-    print(f"Cliente Dice: {data}")
-
-    response = "Mensaje Recibido"
-
-    # Convierto el string del mensaje a bytes y lo envio
-    conn.sendall(response.encode())
-
-    #cerrar conexion
-    conn.close()
-
-    # cierro puerto
+    # nunca llegamos acá porque el servidor queda corriendo
     NodoB.close()
 
 if __name__ == "__main__":
-    start_server()    
+    start_server()
