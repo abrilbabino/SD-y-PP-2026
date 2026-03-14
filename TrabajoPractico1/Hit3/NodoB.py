@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 # cargo las variables del .env
 load_dotenv()
 
-HOST = os.getenv("HOST_SERVER_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER_TCP_TP1"))
+HOST = os.getenv("HOST_SERVER1_TCP_TP1")
+PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
 
 def start_server():
     # Creo el socket con el tipo de direccionamiento ipv4 (AF_INET) y el tipo de protocolo (SOCK_TREAM para TCP)
@@ -29,7 +29,7 @@ def start_server():
 
             while True:
                 data = conn.recv(1024).decode()
-                if not data:
+                if data == "":
                     # si el cliente cerró la conexión, salgo del loop interno
                     print(f"Cliente {addr} desconectado.")
                     break
