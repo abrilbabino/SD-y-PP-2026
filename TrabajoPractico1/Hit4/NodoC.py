@@ -15,6 +15,7 @@ def handle_conn(conn, addr):
     print(f"[SERVER] Conectado con {addr}")
 
     try:
+       
         while True:
 
             data = conn.recv(1024)
@@ -31,7 +32,7 @@ def handle_conn(conn, addr):
 
     finally:
         conn.close()
-        print(f"[SERVER] Conexion cerradad con {addr}")
+        print(f"[SERVER] Conexion cerrada con {addr}")
 
 
 def start_server(host, port):
