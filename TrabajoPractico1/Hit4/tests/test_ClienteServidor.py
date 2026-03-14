@@ -57,6 +57,7 @@ def test_ClienteServidor():
     client1_thread.start()
     client2_thread.start()
 
+    # espero que termine el cliente1 y el cliente2
     client1_thread.join(timeout=5)
     client2_thread.join(timeout=5)
 
