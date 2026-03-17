@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient #TestClient permite simular requests HTTP a la API sin levantar un servidor real.
-from prueba_ci_cd import app 
+from ..prueba_ci_cd import app 
 
 client = TestClient(app) #aca creamos al cliente 
 
