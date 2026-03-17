@@ -3,7 +3,7 @@ import os
 import time
 
 HOST = "127.0.0.1"
-PORT = 5000
+PORT = 8888
 RETRY_DELAY = 3
 
 def start_client():
