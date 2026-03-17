@@ -1,20 +1,17 @@
-""" import threading
+import threading
 import time
-import os
-from dotenv import load_dotenv
+
 from ..NodoC import start_server, start_client
 
-
-load_dotenv()
 
 # a los puertos le sumo 1000 porque al ejecutar todos los test juntos estaba quedando
 #  algun server residual ocupando el puerto y hacia que no pase el test
 
-HOST1 = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT1 = int(os.getenv("PORT_SERVER1_TCP_TP1")) + 1000
-HOST2 = os.getenv("HOST_SERVER2_TCP_TP1")
-PORT2 = int(os.getenv("PORT_SERVER2_TCP_TP1")) + 1000
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+HOST1 = "127.0.0.1"
+PORT1 = 8888
+HOST2 = "127.0.0.1"
+PORT2 = 9999
+RETRY_DELAY = 3
 
 
 def run_client(target_host, target_port, result_container):
@@ -70,5 +67,3 @@ def test_ClienteServidor():
     assert len(responses_nodo2) > 0
     assert "Mensaje Recibido" in responses_nodo1[0]
     assert "Mensaje Recibido" in responses_nodo2[0]
-
-"""
