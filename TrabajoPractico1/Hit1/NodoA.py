@@ -5,7 +5,7 @@ import os
 #load_dotenv()
 
 HOST = "127.0.0.1"
-PORT = 5000
+PORT = 8888
 
 def start_client():
 

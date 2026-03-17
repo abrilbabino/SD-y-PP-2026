@@ -1,12 +1,9 @@
 import socket
 import os
-from dotenv import load_dotenv
+import time
 
-# cargo las variables del .env
-load_dotenv()
-
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+HOST = "127.0.0.1"
+PORT = 8888
 
 def start_server():
     # Creo el socket con el tipo de direccionamiento ipv4 (AF_INET) y el tipo de protocolo (SOCK_TREAM para TCP)
