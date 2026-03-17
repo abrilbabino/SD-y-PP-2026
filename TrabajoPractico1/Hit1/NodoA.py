@@ -2,10 +2,10 @@ import socket
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+#load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+HOST = "127.0.0.1"
+PORT = 5000
 
 def start_client():
 

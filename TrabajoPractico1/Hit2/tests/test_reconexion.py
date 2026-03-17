@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from ..NodoB import start_server
 from ..NodoA import start_client
 
-load_dotenv()
+#load_dotenv()
 
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+RETRY_DELAY = 3
 
 
 def run_server():

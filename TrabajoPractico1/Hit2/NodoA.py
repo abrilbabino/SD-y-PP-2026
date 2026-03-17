@@ -3,11 +3,11 @@ import os
 import time
 from dotenv import load_dotenv
 
-load_dotenv()
+#load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+HOST = "127.0.0.1"
+PORT = 5000
+RETRY_DELAY = 3
 
 def start_client():
 
