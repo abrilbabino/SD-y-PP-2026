@@ -10,9 +10,9 @@ client → simula un navegador o cliente HTTP"""
 def test_root():
     response = client.get("/")  #Enviar una request GET
     assert response.status_code == 200  #Verificar el código HTTP
-    assert response.json() == {"message": "CI/CD funcionando, soy crack"}
+    assert response.json() == {"mensaje": " La API grupo NAJ esta funcionando correctamente "}
 
 def test_saludo():
     response = client.get("/saludo")
     assert response.status_code == 200
-    assert response.json() == {"mensaje": "Hola, este es otro endpoint ;)"}
+    assert response.json() == {"mensaje": " Hola, Bienvenido a la API del GRUPO NAJ :) "}
