@@ -1,13 +1,11 @@
 import threading
 import time
 import os
-from dotenv import load_dotenv
-from TrabajoPractico1.Hit3.NodoB import start_server
-from TrabajoPractico1.Hit3.NodoA import start_client
+from ..NodoB import start_server
+from ..NodoA import start_client
 
-load_dotenv()
 
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+RETRY_DELAY = 3
 
 def run_server():
     start_server()

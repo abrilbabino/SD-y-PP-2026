@@ -1,17 +1,13 @@
 import threading
 import time
 import os
-from dotenv import load_dotenv
 from ..NodoC import start_server, start_client
 
-
-load_dotenv()
-
-HOST1 = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT1 = int(os.getenv("PORT_SERVER1_TCP_TP1"))
-HOST2 = os.getenv("HOST_SERVER2_TCP_TP1")
-PORT2 = int(os.getenv("PORT_SERVER2_TCP_TP1"))
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+HOST1 = "127.0.0.1"
+PORT1 = 5000
+HOST2 = "127.0.0.1"
+PORT2 = 8888
+RETRY_DELAY = 3
 
 
 def run_client(target_host, target_port, result_container):

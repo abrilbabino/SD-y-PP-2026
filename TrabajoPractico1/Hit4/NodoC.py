@@ -2,12 +2,8 @@ import socket
 import threading
 import os
 import time
-from dotenv import load_dotenv
 
-# cargo las variables del .env
-load_dotenv()
-
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+RETRY_DELAY = 3
 
 
 def handle_conn(conn, addr):
@@ -81,8 +77,5 @@ def start_client(target_host, target_port):
 
             print("[CLIENT] Servidor no disponible, reintentando en {RETRY_DELAY} segundos...")
             time.sleep(RETRY_DELAY)
-
-
-
         return response
         

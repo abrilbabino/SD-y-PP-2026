@@ -3,12 +3,8 @@ import threading
 import os
 import time
 import json
-from dotenv import load_dotenv
 
-# cargo las variables del .env
-load_dotenv()
-
-RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
+RETRY_DELAY = 3
 
 
 def handle_conn(conn, addr):
