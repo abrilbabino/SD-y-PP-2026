@@ -1,7 +1,7 @@
 import threading
 import time
 import os
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from ..NodoB import start_server
 from ..NodoA import start_client
 
