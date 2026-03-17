@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException #importacion de framework
-import uvicorn
-import os
+from fastapi import FastAPI #importacion de framework
+
 
 """
 Creación de la aplicación FastAPI.
