@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException #importacion de framework
+import uvicorn
+import os
 
 """
 Creación de la aplicación FastAPI.
@@ -18,3 +20,6 @@ def read_root():  # función que responde la request
 @app.get("/saludo")
 def saludo():
     return {"mensaje": " Hola, Bienvenido a la API del GRUPO NAJ :) "}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
