@@ -38,9 +38,9 @@ jobs:
     #   run: |
     #     flake8 .
 
-    # - name: Run tests
-    #   run: |
-    #    pytest
+    - name: Run tests
+      run: |
+        pytest
 
   # Implementa Gitleaks para detectar secrets hardcodeados, si falla entonces el pipeline falla.
   security:
@@ -77,3 +77,8 @@ jobs:
       with:
         name: python-build
         path: build/
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: fastapiCICD
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
