@@ -82,7 +82,31 @@ def start_client(target_host, target_port):
             print("[CLIENT] Servidor no disponible, reintentando en {RETRY_DELAY} segundos...")
             time.sleep(RETRY_DELAY)
 
-
-
-        return response
         
+if __name__ == "__main__":
+
+    import sys
+
+    my_port = int(sys.argv[1])
+    peer_port = int(sys.argv[2])
+
+    HOST = "127.0.0.1"
+
+    # levanto el servidor del nodo
+    thread_server = threading.Thread(
+        target=start_server,
+        args=(HOST, my_port),
+        daemon=True
+    )
+
+    thread_server.start()
+
+    time.sleep(1)
+
+    # este nodo se conecta al otro
+    response = start_client(HOST, peer_port)
+
+    print(f"[NODE {my_port}] respuesta: {response}")
+
+    while True:
+        time.sleep(1)
