@@ -89,7 +89,7 @@ if __name__ == "__main__":
     )
     thread_server.start()
 
-    # Pequeña espera para asegurar que el server levante
+    # Espera para asegurar que el server levante
     time.sleep(1)
 
     #Thread del cliente (intenta conectarse al otro nodo continuamente)

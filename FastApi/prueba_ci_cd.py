@@ -19,3 +19,4 @@ def read_root():  # función que responde la request
 @app.get("/saludo")
 def saludo():
     return {"mensaje": " Hola, Bienvenido a la API del GRUPO NAJ :) "}
+
