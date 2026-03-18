@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+
+HOST, PORT = os.getenv("SERVER_1_ADDR_TP1").split(":")
+PORT = int(PORT)
+
 
 def start_client():
 

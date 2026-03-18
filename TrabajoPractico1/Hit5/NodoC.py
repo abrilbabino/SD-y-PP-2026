@@ -44,7 +44,7 @@ def handle_conn(conn, addr):
         print(f"[SERVER] Conexion cerrada con {addr}")
 
 
-def start_server(host, port):
+def start_server(host, port, stop_event):
     # Creo el socket con el tipo de direccionamiento ipv4 (AF_INET) y el tipo de protocolo (SOCK_TREAM para TCP)
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -55,11 +55,17 @@ def start_server(host, port):
     server.bind((host, port))
     server.listen()
 
+    server.settimeout(1)
+
     print(f"Server Listening on {host}:{port} ...")
 
   # Loop infinito para aceptar múltiples conexiones
-    while True:
-        conn, addr = server.accept()
+    while not stop_event.is_set():
+
+        try:
+            conn, addr = server.accept()
+        except socket.timeout:
+            continue
         
         # creo el hilo del server con los datos del socket
         server_thread = threading.Thread(
@@ -70,12 +76,15 @@ def start_server(host, port):
 
         server_thread.start()
 
+    server.close()
+    print(f"Server {host}:{port} cerrado")
+
 
 def start_client(target_host, target_port):
 
     # meto la conexion del cliente en un loop infinito
     while True:
-
+        
         # Intenta conectarse al servidor y si no puede se queda reintentando
         try:
             client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,7 +104,8 @@ def start_client(target_host, target_port):
                 response_json = client.recv(1024).decode()
 
                 if not response_json:
-                    continue
+                    client.close()
+                    raise ConnectionError("conexion cerrada")
 
                 response = json.loads(response_json)
                 client.close()

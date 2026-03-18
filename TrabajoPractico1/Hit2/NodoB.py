@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 # cargo las variables del .env
 load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+HOST, PORT = os.getenv("SERVER_1_ADDR_TP1").split(":")
+PORT = int(PORT)
+
 
 def start_server():
     # Creo el socket con el tipo de direccionamiento ipv4 (AF_INET) y el tipo de protocolo (SOCK_TREAM para TCP)
@@ -41,6 +42,7 @@ def start_server():
 
     # cierro la conexion
     NodoB.close()
+    conn.close()
 
 if __name__ == "__main__":
     start_server()    
