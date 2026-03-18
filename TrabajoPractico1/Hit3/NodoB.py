@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 # cargo las variables del .env
 load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+HOST, PORT = os.getenv("SERVER_1_ADDR_TP1").split(":")
+PORT = int(PORT)
 
-def start_server():
+def start_server(stop_event):
     # Creo el socket con el tipo de direccionamiento ipv4 (AF_INET) y el tipo de protocolo (SOCK_TREAM para TCP)
     NodoB = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -19,11 +19,17 @@ def start_server():
     NodoB.bind((HOST, PORT))
     NodoB.listen()
 
+    NodoB.settimeout(1)
+
     print(f"Server (NodoB) Listening on {HOST}:{PORT} ...")
 
-  # Loop infinito para aceptar múltiples conexiones
-    while True:
-        conn, addr = NodoB.accept()
+  # Loop infinito para aceptar múltiples conexiones. el stop event es para finalizar explicitamente el servidor luego de los test y que no quede levantado.
+    while not stop_event.is_set():
+        try:
+            conn, addr = NodoB.accept()
+        except socket.timeout:
+            continue #vuelve a checkear el stop event
+        
         with conn:
             print(f"Conexion recibida desde {addr}")
 
@@ -32,14 +38,16 @@ def start_server():
                 if data == "":
                     # si el cliente cerró la conexión, salgo del loop interno
                     print(f"Cliente {addr} desconectado.")
+                    conn.close()
                     break
 
                 print(f"Cliente Dice: {data}")
                 response = "Mensaje Recibido"
                 conn.sendall(response.encode())
 
-    # nunca llegamos acá porque el servidor queda corriendo
+    
     NodoB.close()
+    print ("Servidor cerrado correctamente")
 
 if __name__ == "__main__":
     start_server()

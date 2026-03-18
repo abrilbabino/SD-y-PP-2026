@@ -7,10 +7,10 @@ from ..NodoC import start_server, start_client
 
 load_dotenv()
 
-HOST1 = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT1 = int(os.getenv("PORT_SERVER1_TCP_TP1"))
-HOST2 = os.getenv("HOST_SERVER2_TCP_TP1")
-PORT2 = int(os.getenv("PORT_SERVER2_TCP_TP1"))
+HOST1, PORT1 = os.getenv("SERVER_1_ADDR_TP1").split(":")
+PORT1 = int(PORT1)
+HOST2, PORT2 = os.getenv("SERVER_2_ADDR_TP1").split(":")
+PORT2 = int(PORT2)
 RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
 
 
@@ -23,16 +23,19 @@ def test_ClienteServidor():
     responses_nodo1 = []
     responses_nodo2 = []
 
+    stop_event1 = threading.Event()
+    stop_event2 = threading.Event()
+
     # Levanto los servidores
     server1_thread = threading.Thread(
         target=start_server,
-        args=(HOST1, PORT1),
+        args=(HOST1, PORT1, stop_event1),
         daemon=True
     )
 
     server2_thread = threading.Thread(
         target=start_server,
-        args=(HOST2, PORT2),
+        args=(HOST2, PORT2, stop_event2),
         daemon=True
     )
 
@@ -68,4 +71,9 @@ def test_ClienteServidor():
     assert "Mensaje Recibido" in responses_nodo1[0]
     assert "Mensaje Recibido" in responses_nodo2[0]
 
+    # cierro los servers
+    stop_event1.set()
+    stop_event2.set()
+    server1_thread.join(timeout=2)
+    server2_thread.join(timeout=2)
    
