@@ -47,7 +47,8 @@ Crear un archivo `.env` con la siguiente configuración:
 ```
 SERVER_1_ADDR_TP1= 127.0.0.1:5000
 ```
-
+Donde:
+- **SERVER_1_ADDR_TP1** → dirección IP y puerto del servidor
 ---
 
 ## **3. Ejecutar el servidor (Nodo B)**
