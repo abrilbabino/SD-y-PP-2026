@@ -23,8 +23,8 @@ def handle_conn(conn, addr):
 
             data = conn.recv(1024)
 
-            # if not data:
-            #     break
+            if not data:
+                 break
 
             # deserializo el mensaje con formato json para obtener un diccionario.
             msg = json.loads(data.decode())
@@ -92,7 +92,7 @@ def register (serverHost, serverPort, nodoHost, nodoPort):
     url = f"http://{serverHost}:{serverPort}/register"
 
     payload = {
-        "host": nodoHost,
+        "host": nodoHost, 
         "port": nodoPort,
     }
 
@@ -144,9 +144,10 @@ def start_nodo(target_host, target_port, host):
         time.sleep(1)
 
 if __name__ == "__main__":
-    target_host = "127.0.0.1"
-    target_port = 5000
+    import sys
 
-    host = "127.0.0.1"
+    target_host = sys.argv[1]
+    target_port = int(sys.argv[2])
+    host = sys.argv[3]
 
     start_nodo(target_host, target_port, host)
