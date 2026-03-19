@@ -54,13 +54,11 @@ pip install -r requirements.txt
 ## **2. Crear archivo `.env`**
 Crear un archivo `.env` con la siguiente configuración:
 ```
-HOST_SERVER_TCP_TP1=127.0.0.1
-PORT_SERVER_TCP_TP1=5000
+SERVER_1_ADDR_TP1 = 127.0.0.1:5000
 RETRY_DELAY=3
 ```
 Donde:
-- **HOST_SERVER_TCP_TP1** → dirección del servidor  
-- **PORT_SERVER_TCP_TP1** → puerto del servidor  
+- **SERVER_1_ADDR_TP1** → dirección IP y puerto del servidor  
 - **RETRY_DELAY** → tiempo de espera antes de reintentar conexión  
 
 ---
@@ -68,7 +66,7 @@ Donde:
 ## **3. Ejecutar el servidor (Nodo B)**
 En una terminal ejecutar:
 ```bash
-python NodoB.py
+python ./TrabajoPractico1/Hit3 NodoB.py
 ```
 El servidor quedará **ejecutándose continuamente**, esperando nuevas conexiones.
 
@@ -77,7 +75,7 @@ El servidor quedará **ejecutándose continuamente**, esperando nuevas conexione
 ## **4. Ejecutar el cliente (Nodo A)**
 En otra terminal ejecutar:
 ```bash
-python NodoA.py
+python ./TrabajoPractico1/Hit3 NodoA.py
 ```
 El cliente:
 - se conectará al servidor
