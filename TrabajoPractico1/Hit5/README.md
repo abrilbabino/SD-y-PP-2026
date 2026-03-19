@@ -57,18 +57,13 @@ pip install -r requirements.txt
 ## **2. Crear archivo `.env`**
 Crear un archivo `.env` con la siguiente configuración:
 ```
-HOST_SERVER1_TCP_TP1= “127.0.0.1”
-PORT_SERVER1_TCP_TP1= 9000
-HOST_SERVER2_TCP_TP1= “127.0.0.1”
-PORT_SERVER2_TCP_TP1= 9001
-
+SERVER_1_ADDR_TP1= 127.0.0.1:9000
+SERVER_2_ADDR_TP1= 127.0.0.1:9001
 RETRY_DELAY= 3
 ```
 Donde:
-- **HOST1_SERVER1_TCP_TP1** → dirección del servidor de la primer instancia de NodoC 
-- **PORT1_SERVER1_TCP_TP1** → puerto del servidor de la primer instancia de NodoC 
-- **HOST2_SERVER2_TCP_TP1** → dirección del servidor  de la segunda instancia de NodoC
-- **PORT2_SERVER2_TCP_TP1** → puerto del servidor  de la segunda instancia de NodoC
+- **SERVER_1_ADDR_TP1** → dirección IP y puerto del servidor de la primer instancia de NodoC 
+- **SERVER_2_ADDR_TP1** → dirección IP y puerto del servidor  de la segunda instancia de NodoC
 - **RETRY_DELAY** → tiempo de espera antes de reintentar conexión  
 
 ---
