@@ -54,7 +54,7 @@ Donde:
 ## **3. Ejecutar el servidor (Nodo B)**
 En una terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit1 NodoB.py
+python .\TrabajoPractico1\Hit1\NodoB.py
 ```
 El servidor comenzará a escuchar conexiones en el puerto configurado.
 
