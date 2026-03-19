@@ -57,7 +57,7 @@ SERVER_1_ADDR_TP1 = 127.0.0.1:5000
 RETRY_DELAY=3
 ```
 Donde:
-- **HOST_SERVER_TCP_TP1** → dirección IP y puerto del servidor  
+- **SERVER_1_ADDR_TP1** → dirección IP y puerto del servidor  
 - **RETRY_DELAY** → tiempo de espera antes de reintentar la conexión  
 
 ---
