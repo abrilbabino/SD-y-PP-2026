@@ -52,18 +52,13 @@ pip install -r requirements.txt
 ## **2. Crear archivo `.env`**
 Crear un archivo `.env` con la siguiente configuración:
 ```
-HOST_SERVER1_TCP_TP1= “127.0.0.1”
-PORT_SERVER1_TCP_TP1= 9000
-HOST_SERVER2_TCP_TP1= “127.0.0.1”
-PORT_SERVER2_TCP_TP1= 9001
-
+SERVER_1_ADDR_TP1= 127.0.0.1:9000
+SERVER_2_ADDR_TP1= 127.0.0.1:9001
 RETRY_DELAY= 3
 ```
 Donde:
-- **HOST1_SERVER1_TCP_TP1** → dirección del servidor de la primer instancia de NodoC 
-- **PORT1_SERVER1_TCP_TP1** → puerto del servidor de la primer instancia de NodoC 
-- **HOST2_SERVER2_TCP_TP1** → dirección del servidor  de la segunda instancia de NodoC
-- **PORT2_SERVER2_TCP_TP1** → puerto del servidor  de la segunda instancia de NodoC
+- **SERVER_1_ADDR_TP1** → dirección IP y puerto del servidor de la primer instancia de NodoC 
+- **SERVER_2_ADDR_TP1** → dirección IP y puerto del servidor  de la segunda instancia de NodoC
 - **RETRY_DELAY** → tiempo de espera antes de reintentar conexión  
 
 ---
@@ -71,7 +66,7 @@ Donde:
 ## **3. Ejecutar primera instancia (Nodo C)**
 En una terminal ejecutar:
 ```bash
-python NodoC.py 9000 9001
+python ./TrabajoPractico1/Hit4 NodoC.py 9000 9001
 ```
 El servidor quedará **ejecutándose continuamente**, esperando nuevas conexiones en el puerto 9000 el cliente se va a conectar al Nodo C que escucha en el puerto 9001:
 - se conectará al servidor
@@ -84,7 +79,7 @@ Si el servidor no está disponible, el cliente seguirá intentando conectarse.
 ## **4. Ejecutar  segunda instancia (Nodo C)**
 En otra terminal ejecutar:
 ```bash
-python NodoC.py 9001 9000
+python ./TrabajoPractico1/Hit4 NodoC.py 9001 9000
 ```
 El servidor quedará **ejecutándose continuamente**, esperando nuevas conexiones en el puerto 9001 el cliente se va a conectar al Nodo C que escucha en el puerto 9000:
 - se conectará al servidor
