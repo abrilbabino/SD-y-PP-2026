@@ -26,15 +26,16 @@ def test_registro_diferido():
     r1 = client.post("/register", json={"host": "127.0.0.1", "port": 5001})
     assert r1.status_code == 200
 
-    # Todavía no debería aparecer (está en futuros)
-    assert r1.json()["nodosPares"] == []
+    # Ahora debería aparecer en futuros
+    assert r1.json()["nodosPares"] == [{"host": "127.0.0.1", "port": 5001}]
 
     # Registro nodo 2
     r2 = client.post("/register", json={"host": "127.0.0.1", "port": 5002})
     assert r2.status_code == 200
 
-    # Sigue sin aparecer nadie en actuales
-    assert r2.json()["nodosPares"] == []
+    # Debería devolver ambos futuros
+    assert {"host": "127.0.0.1", "port": 5001} in r2.json()["nodosPares"]
+    assert {"host": "127.0.0.1", "port": 5002} in r2.json()["nodosPares"]
 
     # Verifico estado interno
     with lock:
@@ -54,14 +55,12 @@ def test_cambio_de_ventana():
         nodos_actuales[:] = nodos_futuros
         nodos_futuros.clear()
 
-    # Ahora deberían estar en actuales
+    # Ahora registro un tercero
     r = client.post("/register", json={"host": "127.0.0.1", "port": 5003})
-
     peers = r.json()["nodosPares"]
 
-    assert len(peers) == 2
-    assert {"host": "127.0.0.1", "port": 5001} in peers
-    assert {"host": "127.0.0.1", "port": 5002} in peers
+    # Como la función devuelve futuros, debería contener solo el nuevo
+    assert peers == [{"host": "127.0.0.1", "port": 5003}]
 
     # El nuevo queda en futuros
     with lock:
