@@ -66,7 +66,7 @@ Donde:
 ## **3. Ejecutar el servidor (Nodo B)**
 En una terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit3 NodoB.py
+python -m TrabajoPractico1.Hit3.NodoB
 ```
 El servidor quedará **ejecutándose continuamente**, esperando nuevas conexiones.
 
@@ -75,7 +75,7 @@ El servidor quedará **ejecutándose continuamente**, esperando nuevas conexione
 ## **4. Ejecutar el cliente (Nodo A)**
 En otra terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit3 NodoA.py
+python -m TrabajoPractico1.Hit3.NodoA
 ```
 El cliente:
 - se conectará al servidor

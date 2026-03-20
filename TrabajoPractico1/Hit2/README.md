@@ -64,7 +64,7 @@ Donde:
 ## **3. Ejecutar el servidor (Nodo B)**
 En una terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit2 NodoB.py
+python -m TrabajoPractico1.Hit2.NodoB
 ```
 El servidor comenzará a escuchar conexiones.
 
@@ -73,7 +73,7 @@ El servidor comenzará a escuchar conexiones.
 ## **4. Ejecutar el cliente (Nodo A)**
 En otra terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit2 NodoA.py
+python -m TrabajoPractico1.Hit2.NodoA
 ```
 Si el servidor no está disponible, el cliente mostrará:
 ```

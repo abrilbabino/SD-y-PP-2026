@@ -54,7 +54,7 @@ Donde:
 ## **3. Ejecutar el servidor (Nodo B)**
 En una terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit1 NodoB.py
+python -m TrabajoPractico1.Hit1.NodoB
 ```
 El servidor comenzará a escuchar conexiones en el puerto configurado.
 
@@ -63,7 +63,7 @@ El servidor comenzará a escuchar conexiones en el puerto configurado.
 ## **4. Ejecutar el cliente (Nodo A)**
 En otra terminal ejecutar:
 ```bash
-python ./TrabajoPractico1/Hit1 NodoA.py
+python -m TrabajoPractico1.Hit1.NodoA
 ```
 El cliente se conectará al servidor, enviará un mensaje y mostrará la respuesta recibida.
 
