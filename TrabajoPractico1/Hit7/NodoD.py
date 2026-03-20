@@ -49,7 +49,7 @@ def scheduler():
             print("[D] Cambio de ventana")
 
             nodos_actuales = nodos_futuros
-            nodos_futuros = []
+            nodos_futuros.clear()
 
             guardar_estado()
 
