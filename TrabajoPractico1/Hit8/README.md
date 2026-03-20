@@ -37,9 +37,9 @@ Esto permite generar automáticamente:
 1. El **Nodo C1** inicia su servidor gRPC en su puerto.
 2. El **Nodo C2** inicia su servidor gRPC en su puerto.
 3. Cada nodo crea un cliente gRPC hacia el otro.
-4. - El cliente construye un mensaje Protobuf **ClientMessage** y lo envía con **stub.SendMessage()**.
-5. - El servidor recibe el objeto Protobuf, lo procesa y responde con un **ServerResponse**.
-6. - El cliente recibe la respuesta, la deserializa y la muestra.
+4. El cliente construye un mensaje Protobuf **ClientMessage** y lo envía con **stub.SendMessage()**.
+5. El servidor recibe el objeto Protobuf, lo procesa y responde con un **ServerResponse**.
+6. El cliente recibe la respuesta, la deserializa y la muestra.
 
 —
 
