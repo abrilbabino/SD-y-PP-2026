@@ -126,10 +126,10 @@ Se mantiene el diseño del HIT #5:
 - Modelo distribuido descentralizado  
 
 **Reintento automático**  
-Se implementa un loop infinito en el cliente  
-Permite tolerancia a fallos  
-Hace el sistema más resiliente  
+- Se implementa un loop infinito en el cliente  
+- Permite tolerancia a fallos  
+- Hace el sistema más resiliente  
 
 **Concurrencia con threads**  
-Permite ejecutar cliente y servidor simultáneamente  
-Simula comportamiento real en sistemas distribuidos  
+- Permite ejecutar cliente y servidor simultáneamente  
+- Simula comportamiento real en sistemas distribuidos  
