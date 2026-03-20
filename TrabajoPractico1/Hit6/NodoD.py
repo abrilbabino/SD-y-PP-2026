@@ -13,7 +13,7 @@ class Nodo(BaseModel):
     host: str
     port: int
 
-@router.post("/Hit6/register")
+@router1.post("/Hit6/register")
 def registrar_nodo(nodo: Nodo):
 
 
@@ -34,7 +34,7 @@ def registrar_nodo(nodo: Nodo):
 
     return {"nodosPares": nodosPares}
 
-@router.get("/Hit6/health")
+@router1.get("/Hit6/health")
 def health():
     uptime = int(time.time() - start_time)
 
