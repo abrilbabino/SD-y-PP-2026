@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "envConfig" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "envConfig" ]
 
 permissions:
   contents: read
@@ -34,13 +34,9 @@ jobs:
         pip install pytest flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # - name: Lint code
-    #   run: |
-    #     flake8 .
-
-    # - name: Run tests
-    #   run: |
-    #    pytest
+    - name: Run tests
+      run: |
+        pytest
 
   # Implementa Gitleaks para detectar secrets hardcodeados, si falla entonces el pipeline falla.
   security:
