@@ -66,7 +66,7 @@ Donde:
 ## **3. Ejecutar primera instancia (Nodo C)**
 En una terminal ejecutar:
 ```bash
-python .\TrabajoPractico1\Hit4\NodoC.py 9000 9001
+python -m TrabajoPractico1.Hit4.NodoC 9000 9001
 ```
 El servidor quedará **ejecutándose continuamente**, esperando nuevas conexiones en el puerto 9000 el cliente se va a conectar al Nodo C que escucha en el puerto 9001:
 - se conectará al servidor
@@ -79,7 +79,7 @@ Si el servidor no está disponible, el cliente seguirá intentando conectarse.
 ## **4. Ejecutar  segunda instancia (Nodo C)**
 En otra terminal ejecutar:
 ```bash
-python .\TrabajoPractico1\Hit4\NodoC.py 9001 9000
+python -m TrabajoPractico1.Hit4.NodoC 9001 9000
 ```
 El servidor quedará **ejecutándose continuamente**, esperando nuevas conexiones en el puerto 9001 el cliente se va a conectar al Nodo C que escucha en el puerto 9000:
 - se conectará al servidor
