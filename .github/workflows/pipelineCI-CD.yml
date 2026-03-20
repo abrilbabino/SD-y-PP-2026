@@ -35,6 +35,10 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
     - name: Run tests
+      env:
+        SERVER_1_ADDR_TP1: ${{ secrets.SERVER_1_ADDR_TP1}}
+        SERVER_2_ADDR_TP1: ${{ secrets.SERVER_2_ADDR_TP1}}
+        RETRY_DELAY: ${{ vars.RETRY_DELAY}}
       run: |
         pytest
 
