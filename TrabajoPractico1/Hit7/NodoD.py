@@ -1,10 +1,10 @@
 import time
 import json
 import threading
-from fastapi import APIRouter
+from fastapi import FastAPI
 from pydantic import BaseModel
 
-router2 = APIRouter()
+app = FastAPI()
 
 ARCHIVO = "inscripciones.json"
 
@@ -49,7 +49,7 @@ def scheduler():
             print("[D] Cambio de ventana")
 
             nodos_actuales = nodos_futuros
-            nodos_futuros.clear()
+            nodos_futuros = []
 
             guardar_estado()
 
@@ -57,7 +57,7 @@ def scheduler():
 # -------------------------------
 # Registro
 # -------------------------------
-@router2.post("/Hit7/register")
+@app.post("/register")
 def registrar_nodo(nodo: Nodo):
 
     newNodo = {
@@ -78,7 +78,7 @@ def registrar_nodo(nodo: Nodo):
 # -------------------------------
 # Health
 # -------------------------------
-@router2.get("/Hit7/health")
+@app.get("/health")
 def health():
     uptime = int(time.time() - start_time)
 
