@@ -86,17 +86,17 @@ Abrir **dos o más terminales**:
 
 ### Terminal 1
 ```bash
-python .\TrabajoPractico1\Hit6\NodoC.py “127.0.0.1” 5000 “127.0.0.1”
+python -m TrabajoPractico1.Hit6.NodoC “127.0.0.1” 5000 “127.0.0.1”
 ```
 
 ### Terminal 2
 ```bash
-python .\TrabajoPractico1\Hit6\NodoC.py “127.0.0.1” 5000 “127.0.0.1”
+python -m TrabajoPractico1.Hit6.NodoC “127.0.0.1” 5000 “127.0.0.1”
 ```
 
 ### Terminal 3 (opcional)
 ```bash
-python .\TrabajoPractico1\Hit6\NodoC.py “127.0.0.1” 5000 “127.0.0.1”
+python -m TrabajoPractico1.Hit6.NodoC “127.0.0.1” 5000 “127.0.0.1”
 ```
 
 ---
