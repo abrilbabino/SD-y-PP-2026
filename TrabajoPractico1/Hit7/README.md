@@ -82,9 +82,9 @@ uvicorn TrabajoPractico1.Hit7.NodoD:app --host 127.0.0.1 --port 8000
 ---
 
 ### 3. Ejecutar Nodo C
-
+```bash
 python -m TrabajoPractico1.Hit7.NodoC "127.0.0.1" 8000 "127.0.0.1"
-
+```
 Parámetros:
 python NodoC.py <host_D> <port_D> <host_C>
 
