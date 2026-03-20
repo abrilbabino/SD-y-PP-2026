@@ -130,19 +130,19 @@ def start_nodo(target_host, target_port, host):
 
     port = start_server(host)
 
-    while True:
-        print("[NODO] Registrando...")
+    print("[NODO] Registrando...")
 
+    nodosPares = register(target_host, target_port, host, port)
+    while nodosPares == []:
+        time.sleep(60)
         nodosPares = register(target_host, target_port, host, port)
 
-        print("[NODO] Activos:", nodosPares)
-
-        for n in nodosPares:
-            conectarAnodo(n["host"], n["port"])
-
-        # espera a próxima ventana
-        time.sleep(60)
-
+    print("[NODO] Activos:", nodosPares)
+    for n in nodosPares:
+        conectarAnodo(n["host"], n["port"])
+    
+    while True:
+        time.sleep(1)
 
 
 if __name__ == "__main__":
