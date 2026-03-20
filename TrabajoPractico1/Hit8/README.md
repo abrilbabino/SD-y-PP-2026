@@ -50,18 +50,14 @@ Esto permite generar automáticamente:
 ```bash
 pip install grpcio grpcio-tools python-dotenv
 ```
-### 2. Generar código a partir de Protobuf
-```bash
-cd TrabajoPractico/Hit8
-python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. nodos.proto
-```
-### 3. Configurar variables de entorno  
+
+### 2. Configurar variables de entorno  
 Crear archivo .env:   
  ```bash 
 - RETRY_DELAY=3
 ```
 
-## 4. Ejecutar Nodos
+## 3. Ejecutar Nodos
 
 Abrir dos terminales:
 
