@@ -23,9 +23,9 @@ def handle_conn(conn, addr):
 
             data = conn.recv(1024)
 
-            # if not data:
-            # log_event("INFO", f"[SERVER] Cliente {addr} desconectado")
-            #     break
+            if not data:
+                log_event("INFO", f"[SERVER] Cliente {addr} desconectado")
+                break
 
             # deserializo el mensaje con formato json para obtener un diccionario.
             msg = json.loads(data.decode())
