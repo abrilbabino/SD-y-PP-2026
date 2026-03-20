@@ -1,5 +1,6 @@
 import socket
 import os
+import threading
 from dotenv import load_dotenv
 
 # cargo las variables del .env
@@ -50,4 +51,5 @@ def start_server(stop_event):
     print ("Servidor cerrado correctamente")
 
 if __name__ == "__main__":
-    start_server()
+    stop_event = threading.Event()
+    start_server(stop_event)
