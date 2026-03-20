@@ -61,6 +61,9 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# Ignorar archivo de inscripciones
+inscripciones.json
+
 # Flask stuff:
 instance/
 .webassets-cache

@@ -22,6 +22,8 @@ jobs:
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v4
+      with: 
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -34,13 +36,13 @@ jobs:
         pip install pytest flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    # - name: Lint code
-    #   run: |
-    #     flake8 .
-
-    # - name: Run tests
-    #   run: |
-    #    pytest
+    - name: Run tests
+      env:
+        SERVER_1_ADDR_TP1: ${{ secrets.SERVER_1_ADDR_TP1}}
+        SERVER_2_ADDR_TP1: ${{ secrets.SERVER_2_ADDR_TP1}}
+        RETRY_DELAY: ${{ vars.RETRY_DELAY}}
+      run: |
+        pytest
 
   # Implementa Gitleaks para detectar secrets hardcodeados, si falla entonces el pipeline falla.
   security:
@@ -52,6 +54,8 @@ jobs:
 
     - name: Checkout Repo
       uses: actions/checkout@v4
+      with: 
+        fetch-depth: 0
 
     - name: Run Gitleaks
       uses: gitleaks/gitleaks-action@v2
@@ -68,6 +72,8 @@ jobs:
 
     - name: Checkout Repo
       uses: actions/checkout@v4
+      with: 
+        fetch-depth: 0
 
     - name: Build artifact
       run: |

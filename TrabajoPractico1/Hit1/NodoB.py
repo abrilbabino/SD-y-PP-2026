@@ -1,14 +1,16 @@
 import socket
 import os
 from dotenv import load_dotenv
+from ..common.logger import log_event
 
 # cargo las variables del .env
 load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+HOST, PORT = os.getenv("SERVER_1_ADDR_TP1").split(":")
+PORT = int(PORT)
 
 def start_server():
+    log_event("INFO", "Nodo B iniciado")
     # Creo el socket con el tipo de direccionamiento ipv4 (AF_INET) y el tipo de protocolo (SOCK_TREAM para TCP)
     NodoB = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -19,28 +21,30 @@ def start_server():
     NodoB.bind((HOST, PORT))
     NodoB.listen()
 
-    print(f"Server (NodoB) Listening on {HOST}:{PORT} ...")
+    log_event("INFO", f"Servidor escuchando en {HOST}:{PORT}")
 
     # Bloquea el programa y cuando alguien se conecta devuelve un nuevo socket dedicado a la conexion con el cliente (conn) y la direccion del cliente (addr)
     conn, addr = NodoB.accept()
 
-    print(f"Conexion recibida desde {addr}")
+    log_event("INFO", f"Conexion recibida desde {addr}")
 
     # el server espera que el cliente envie datos (hasta 1024 bytes) por eso se usa el decode() para convertirlos a string
     data = conn.recv(1024).decode()
 
-    print(f"Cliente Dice: {data}")
+    log_event("INFO", f"Mensaje recivido del cliente: {data}")
 
     response = "Mensaje Recibido"
-
     # Convierto el string del mensaje a bytes y lo envio
     conn.sendall(response.encode())
+    log_event("INFO", "Respuesta enviada al cliente")
 
     #cerrar conexion
     conn.close()
 
     # cierro puerto
     NodoB.close()
+    log_event("INFO", "Servidor cerrado")
+
 
 if __name__ == "__main__":
     start_server()    
