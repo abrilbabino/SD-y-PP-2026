@@ -1,7 +1,8 @@
 import time
 from fastapi.testclient import TestClient
 
-from ..NodoD import app, nodos_actuales, nodos_futuros, lock
+from api.main import app
+from ..NodoD import nodos_actuales, nodos_futuros, lock
 
 client = TestClient(app)
 
@@ -23,14 +24,14 @@ def test_registro_diferido():
     limpiar_estado()
 
     # Registro nodo 1
-    r1 = client.post("/register", json={"host": "127.0.0.1", "port": 5001})
+    r1 = client.post("/Hit7/register", json={"host": "127.0.0.1", "port": 5001})
     assert r1.status_code == 200
 
     # Todavía no debería aparecer (está en futuros)
     assert r1.json()["nodosPares"] == []
 
     # Registro nodo 2
-    r2 = client.post("/register", json={"host": "127.0.0.1", "port": 5002})
+    r2 = client.post("/Hit7/register", json={"host": "127.0.0.1", "port": 5002})
     assert r2.status_code == 200
 
     # Sigue sin aparecer nadie en actuales
@@ -46,8 +47,8 @@ def test_cambio_de_ventana():
     limpiar_estado()
 
     # Registro nodos en futuros
-    client.post("/register", json={"host": "127.0.0.1", "port": 5001})
-    client.post("/register", json={"host": "127.0.0.1", "port": 5002})
+    client.post("/Hit7/register", json={"host": "127.0.0.1", "port": 5001})
+    client.post("/Hit7/register", json={"host": "127.0.0.1", "port": 5002})
 
     # FORZAR cambio de ventana (en vez de esperar)
     with lock:
@@ -55,7 +56,7 @@ def test_cambio_de_ventana():
         nodos_futuros.clear()
 
     # Ahora deberían estar en actuales
-    r = client.post("/register", json={"host": "127.0.0.1", "port": 5003})
+    r = client.post("/Hit7/register", json={"host": "127.0.0.1", "port": 5003})
 
     peers = r.json()["nodosPares"]
 
@@ -70,7 +71,7 @@ def test_cambio_de_ventana():
 
 def test_health():
 
-    r = client.get("/health")
+    r = client.get("/Hit7/health")
 
     assert r.status_code == 200
 
