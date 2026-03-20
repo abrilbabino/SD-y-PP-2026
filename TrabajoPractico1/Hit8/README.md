@@ -102,7 +102,7 @@ stub.SendMessage(ClientMessage) -------------------->  [Servidor] recibe objeto 
  procesa y responde con ServerResponse
 stub devuelve ServerResponse  -------------> [Cliente] recibe respuesta como objeto Protobuf
  {msg: “Mensaje Recibido”}
- 				**Ambos servidores siguen escuchando nuevas conexiones RPC**
+ 				  Ambos servidores siguen escuchando nuevas conexiones RPC
 ```
 
 ### Decisiones de Diseño
