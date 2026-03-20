@@ -5,6 +5,8 @@ import time
 from dotenv import load_dotenv
 import grpc
 from concurrent import futures
+from ..common.logger import log_event
+
 
 sys.path.append(os.path.dirname(__file__))
 
@@ -18,7 +20,8 @@ RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
 
 class NodeServiceServicer(nodos_pb2_grpc.NodeServiceServicer):
     def SendMessage(self, request, context):
-        print(f"[SERVER] Mensaje recibido: {request.msg}")
+        log_event("INFO", f"[SERVER] Mensaje recibido de: {request.msg}")
+
         return nodos_pb2.ServerResponse(type="msgRecibido", msg="Mensaje Recibido")
 
 
@@ -35,7 +38,7 @@ def start_server(host, port):
     # Inicio el servidor gRPC
     server.start()
 
-    print(f"Server Listening on {host}:{port} ...")
+    log_event("INFO", f"[SERVER] Escuchando en {host}:{port}")
 
     # Mantengo el servidor corriendo indefinidamente para aceptar múltiples conexiones
     server.wait_for_termination()
@@ -53,10 +56,12 @@ def start_client(target_host, target_port):
                 msg = nodos_pb2.ClientMessage(type = "Cliente Conectado", msg = "[CLIENTE] Me Conecte")
                # Envío el mensaje al servidor mediante la llamada RPC SendMessage
                 response = stub.SendMessage(msg)
+                log_event("INFO", f"[CLIENTE] Respuesta recibida del servidor: {response.msg}")
+
                 return response.msg
 
         except grpc.RpcError:
-            print("[CLIENTE] Servidor no disponible, reintentando en {RETRY_DELAY} segundos...")
+            log_event("ERROR", f"[CLIENTE] Servidor no disponible, reintentando en {RETRY_DELAY} segundos...")
             time.sleep(RETRY_DELAY)
 
 
