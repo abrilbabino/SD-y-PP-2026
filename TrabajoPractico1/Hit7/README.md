@@ -77,13 +77,13 @@ RETRY_DELAY=3
 ### 2. Ejecutar Nodo D
 Estar dentro de la carpeta Hit7 y ejecutar:
 ```bash
-uvicorn NodoD:app --host 127.0.0.1 --port 8000
+uvicorn TrabajoPractico1.Hit7.NodoD:app --host 127.0.0.1 --port 8000
 ```
 ---
 
 ### 3. Ejecutar Nodo C
 
-python .\TrabajoPractico1\Hit7\NodoC.py 127.0.0.1 8000 127.0.0.1
+python -m TrabajoPractico1.Hit7.NodoC "127.0.0.1" 8000 "127.0.0.1"
 
 Parámetros:
 python NodoC.py <host_D> <port_D> <host_C>
@@ -95,9 +95,9 @@ python NodoC.py <host_D> <port_D> <host_C>
 Ejecutar en diferentes terminales:
 
 ```bash
-python .\TrabajoPractico1\Hit7\NodoC.py 127.0.0.1 8000 127.0.0.1
-python .\TrabajoPractico1\Hit7\NodoC.py 127.0.0.1 8000 127.0.0.1
-python .\TrabajoPractico1\Hit7\NodoC.py 127.0.0.1 8000 127.0.0.1
+python -m TrabajoPractico1.Hit7.NodoC  "127.0.0.1" 8000 "127.0.0.1"
+python -m TrabajoPractico1.Hit7.NodoC  "127.0.0.1" 8000 "127.0.0.1"
+python -m TrabajoPractico1.Hit7.NodoC  "127.0.0.1" 8000 "127.0.0.1"
 ```
 
 ---
