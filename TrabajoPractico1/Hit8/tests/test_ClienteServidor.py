@@ -2,13 +2,9 @@ import threading
 import time
 import os
 from dotenv import load_dotenv
-from ..NodoC import start_server, start_client
-
+from TrabajoPractico1.Hit8.NodoC import start_server, start_client
 
 load_dotenv()
-
-# a los puertos le sumo 1000 porque al ejecutar todos los test juntos estaba quedando
-#  algun server residual ocupando el puerto y hacia que no pase el test
 
 HOST1, PORT1 = os.getenv("SERVER_1_ADDR_TP1").split(":")
 PORT1 = int(PORT1)
@@ -16,44 +12,40 @@ HOST2, PORT2 = os.getenv("SERVER_2_ADDR_TP1").split(":")
 PORT2 = int(PORT2)
 RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
 
-
 def run_client(target_host, target_port, result_container):
     response = start_client(target_host, target_port)
     result_container.append(response)
 
-
-def test_ClienteServidor():
+def test_ClienteServidor_gRPC():
     responses_nodo1 = []
     responses_nodo2 = []
 
     stop_event1 = threading.Event()
     stop_event2 = threading.Event()
 
-    # Levanto los servidores
+    # Levanto los servidores gRPC
     server1_thread = threading.Thread(
         target=start_server,
-        args=(HOST1, PORT1, stop_event1),
+        args=(HOST1, PORT1),
         daemon=True
     )
-
     server2_thread = threading.Thread(
         target=start_server,
-        args=(HOST2, PORT2, stop_event2),
+        args=(HOST2, PORT2),
         daemon=True
     )
 
     server1_thread.start()
     server2_thread.start()
 
-    time.sleep(1)  # espero que el servidor arranque
+    time.sleep(1)  # espero que los servidores arranquen
 
-    # levanto los clientes, client1 contra server2 y client2 contra server1
+    # Levanto los clientes: client1 contra server2 y client2 contra server1
     client1_thread = threading.Thread(
         target=run_client,
         args=(HOST2, PORT2, responses_nodo1),
         daemon=True
     )
-
     client2_thread = threading.Thread(
         target=run_client,
         args=(HOST1, PORT1, responses_nodo2),
@@ -63,19 +55,16 @@ def test_ClienteServidor():
     client1_thread.start()
     client2_thread.start()
 
-    # espero que termine el cliente1 y el cliente2
+    # espero que terminen los clientes
     client1_thread.join()
     client2_thread.join()
 
     time.sleep(RETRY_DELAY)
 
+    # verifico que ambos recibieron la respuesta esperada
     assert len(responses_nodo1) > 0
     assert len(responses_nodo2) > 0
     assert "Mensaje Recibido" in responses_nodo1[0]
     assert "Mensaje Recibido" in responses_nodo2[0]
 
-    # cierro los servers
-    stop_event1.set()
-    stop_event2.set()
-    server1_thread.join(timeout=2)
-    server2_thread.join(timeout=2)
+    # en gRPC se quedan bloqueados en wait_for_termination,por lo que en este test simplemente dejamos los threads como daemon)

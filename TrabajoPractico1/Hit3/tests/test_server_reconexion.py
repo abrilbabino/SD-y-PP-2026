@@ -9,8 +9,8 @@ load_dotenv()
 
 RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
 
-def run_server():
-    start_server()
+def run_server(stop_event):
+    start_server(stop_event)
 
 def run_client(result_container):
     response = start_client()
@@ -19,8 +19,13 @@ def run_client(result_container):
 def test_server_survives_client_disconnect():
     result = []
 
+    stop_event = threading.Event()
+
     # Levanto el servidor en un hilo
-    server_thread = threading.Thread(target=run_server, daemon=True)
+    server_thread = threading.Thread(
+        target=run_server,
+        args=(stop_event,),
+        daemon=True)
     server_thread.start()
 
     time.sleep(1)  # espero que el servidor arranque
@@ -49,3 +54,9 @@ def test_server_survives_client_disconnect():
     assert "Mensaje Recibido" in client2_result[0]
 
     print("Servidor respondió correctamente a ambos clientes.")
+
+    # detengo el servidor
+    stop_event.set()
+    server_thread.join(timeout=2)
+
+    
