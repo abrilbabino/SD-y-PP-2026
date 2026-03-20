@@ -76,7 +76,6 @@ python -m TrabajoPractico1.Hit8.NodoC 5001 5000
 ```
 
 ### Concurrencia
-
 Se utilizan threads:  
 - 1 para el servidor  
 - 1 para el cliente  
@@ -95,15 +94,15 @@ Si el servidor no está disponible:
 [Servidor] grpc.server(...) escucha en puerto      [Servidor] grpc.server(...) escucha en puerto
 [Cliente] grpc.insecure_channel()  ----------------->  [Servidor] acepta conexión internamente
 stub.SendMessage(ClientMessage) -------------------->  [Servidor] recibe objeto Protobuf
-                                                                             procesa y responde con ServerResponse
+														procesa y responde con ServerResponse
 [Cliente] recibe respuesta como objeto Protobuf <------- stub devuelve ServerResponse
-							        {msg: “Mensaje Recibido”}
+							        							{msg: “Mensaje Recibido”}
 [Servidor] acepta conexión internamente  <-------------  [Cliente] grpc.insecure_channel() 
 [Servidor] recibe objeto Protobuf <----------------------  stub.SendMessage(ClientMessage)
  procesa y responde con ServerResponse
 stub devuelve ServerResponse  -------------> [Cliente] recibe respuesta como objeto Protobuf
  {msg: “Mensaje Recibido”}
- Ambos servidores siguen escuchando nuevas conexiones RPC
+ 				**Ambos servidores siguen escuchando nuevas conexiones RPC**
 ```
 
 ### Decisiones de Diseño
