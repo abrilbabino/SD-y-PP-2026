@@ -76,4 +76,3 @@ def test_ClienteServidor():
     stop_event2.set()
     server1_thread.join(timeout=2)
     server2_thread.join(timeout=2)
-   
