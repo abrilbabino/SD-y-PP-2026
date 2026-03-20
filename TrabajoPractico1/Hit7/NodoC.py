@@ -19,28 +19,31 @@ def handle_conn(conn, addr):
     try:
        
         while True:
+            try:
+                data = conn.recv(1024)
 
-            data = conn.recv(1024)
+                if not data:
+                    log_event("INFO", f"[SERVER] Cliente {addr} desconectado")
+                    break
 
-            if not data:
-                log_event("INFO", f"[SERVER] Cliente {addr} desconectado")
+                # deserializo el mensaje con formato json para obtener un diccionario.
+                msg = json.loads(data.decode())
+
+                log_event("INFO", f"[SERVER] Mensaje recibido de {addr}: {msg}")
+
+                response = {
+                    "type"  : "msgRecibido",
+                    "msg"   : "Mensaje Recibido",  
+                }
+
+                # serializo la respuesta
+                response_json = json.dumps(response)
+
+                log_event("INFO", f"[SERVER] Respuesta enviada a {addr}: {response}")
+            
+            except: 
+                log_event("INFO", f"[SERVER] Cliente {addr} cerró la conexión abruptamente")
                 break
-
-            # deserializo el mensaje con formato json para obtener un diccionario.
-            msg = json.loads(data.decode())
-
-            log_event("INFO", f"[SERVER] Mensaje recibido de {addr}: {msg}")
-
-            response = {
-                "type"  : "msgRecibido",
-                "msg"   : "Mensaje Recibido",  
-            }
-
-            # serializo la respuesta
-            response_json = json.dumps(response)
-
-            log_event("INFO", f"[SERVER] Respuesta enviada a {addr}: {response}")
-
     finally:
         conn.close()
         log_event("INFO", f"[SERVER] Conexion cerrada con {addr}")
@@ -145,15 +148,12 @@ def start_nodo(target_host, target_port, host):
     log_event("INFO", f"[NODO] Nodo escuchando en {host}:{port}")
 
     nodosPares = register(target_host, target_port, host, port)
+
     log_event("INFO", f"[NODO] Pares encontrados: {nodosPares}")
-
-    while nodosPares == []:
-        time.sleep(60)
-        nodosPares = register(target_host, target_port, host, port)
-
     log_event("INFO", "[NODO] Nodo en ejecucion")
     for n in nodosPares:
-        conectarAnodo(n["host"], n["port"])
+        if not (n["host"] == host and n["port"] == port):
+            conectarAnodo(n["host"], n["port"])
     
     while True:
         time.sleep(1)
