@@ -1,4 +1,3 @@
-import sys
 import socket
 import threading
 import os
@@ -22,8 +21,8 @@ def handle_conn(conn, addr):
 
             data = conn.recv(1024)
 
-            # if not data:
-            #     break
+            if not data:
+                 break
 
             # deserializo el mensaje con formato json para obtener un diccionario.
             msg = json.loads(data.decode())
@@ -85,8 +84,7 @@ def aceptarConn (server):
         ).start()
 
 
-
-def register (serverHost, serverPort, nodoHost, nodoPort):
+def register(serverHost, serverPort, nodoHost, nodoPort):
 
     url = f"http://{serverHost}:{serverPort}/register"
 
@@ -97,12 +95,11 @@ def register (serverHost, serverPort, nodoHost, nodoPort):
 
     while True:
         try:
-
             response = requests.post(url, json=payload)
             return response.json()["nodosPares"]
-        except:
+        except Exception as e:
+            print("[REGISTER] error:", e)
             time.sleep(RETRY_DELAY)
-
 
 
 def conectarAnodo (host, port):
@@ -127,23 +124,28 @@ def conectarAnodo (host, port):
 
 
 
-
 def start_nodo(target_host, target_port, host):
 
     port = start_server(host)
 
+    print("[NODO] Registrando...")
+
     nodosPares = register(target_host, target_port, host, port)
+    while nodosPares == []:
+        time.sleep(60)
+        nodosPares = register(target_host, target_port, host, port)
 
-    print("[NODO] Pares encontrados: ", nodosPares)
-
+    print("[NODO] Activos:", nodosPares)
     for n in nodosPares:
-        conectarAnodo(n["host"],n["port"])
-
+        conectarAnodo(n["host"], n["port"])
+    
     while True:
         time.sleep(1)
 
+
 if __name__ == "__main__":
-    
+    import sys
+
     target_host = sys.argv[1]
     target_port = int(sys.argv[2])
     host = sys.argv[3]
