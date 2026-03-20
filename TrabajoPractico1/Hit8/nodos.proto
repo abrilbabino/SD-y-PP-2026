@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package nodos;
+
+// Mensaje enviado por el cliente
+message ClientMessage {
+  string type = 1;
+  string msg = 2;
+}
+
+// Respuesta del servidor
+message ServerResponse {
+  string type = 1;
+  string msg = 2;
+}
+
+// Servicio de comunicación
+service NodeService {
+  rpc SendMessage(ClientMessage) returns (ServerResponse);
+}
