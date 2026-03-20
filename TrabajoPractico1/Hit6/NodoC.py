@@ -10,8 +10,6 @@ import requests
 load_dotenv()
 
 RETRY_DELAY = int(os.getenv("RETRY_DELAY"))
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-
 
 def handle_conn(conn, addr):
 
