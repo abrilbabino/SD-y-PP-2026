@@ -1,24 +1,28 @@
 import socket
 import os
 from dotenv import load_dotenv
+from ..common.logger import log_event
 
 load_dotenv()
 
-HOST = os.getenv("HOST_SERVER1_TCP_TP1")
-PORT = int(os.getenv("PORT_SERVER1_TCP_TP1"))
+
+HOST, PORT = os.getenv("SERVER_1_ADDR_TP1").split(":")
+PORT = int(PORT)
+
 
 def start_client():
 
+    log_event("INFO", "Nodo A iniciado")
     NodoA = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     NodoA.connect((HOST, PORT))
 
     msg = "Me conecte, soy el nodo A"
+    log_event("INFO", f"Enviando mensaje: {msg}")
     NodoA.sendall(msg.encode())
 
     response = NodoA.recv(1024).decode()
-    print("Respuesta del servidor:", response)
-
+    log_event("INFO", f"Respuesta del servidor: {response}")
     NodoA.close()
 
     return response
