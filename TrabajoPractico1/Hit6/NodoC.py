@@ -140,7 +140,8 @@ def conectarAnodo (host, port):
 
 
     except Exception as e:
-        print("[CLIENTE] error: ", e)
+        log_event("ERROR", f"[CLIENT] error {e}")
+
 
 
 
