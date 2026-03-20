@@ -45,16 +45,16 @@ pip install python-dotenv
 Crear un archivo `.env` con la siguiente configuración:
 
 ```
-HOST_SERVER_TCP_TP1=127.0.0.1
-PORT_SERVER_TCP_TP1=5000
+SERVER_1_ADDR_TP1= 127.0.0.1:5000
 ```
-
+Donde:
+- **SERVER_1_ADDR_TP1** → dirección IP y puerto del servidor
 ---
 
 ## **3. Ejecutar el servidor (Nodo B)**
 En una terminal ejecutar:
 ```bash
-python NodoB.py
+python ./TrabajoPractico1/Hit1 NodoB.py
 ```
 El servidor comenzará a escuchar conexiones en el puerto configurado.
 
@@ -63,7 +63,7 @@ El servidor comenzará a escuchar conexiones en el puerto configurado.
 ## **4. Ejecutar el cliente (Nodo A)**
 En otra terminal ejecutar:
 ```bash
-python NodoA.py
+python ./TrabajoPractico1/Hit1 NodoA.py
 ```
 El cliente se conectará al servidor, enviará un mensaje y mostrará la respuesta recibida.
 
