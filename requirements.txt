@@ -1,0 +1,9 @@
+python-dotenv
+fastapi
+uvicorn
+requests
+pydantic
+httpx
+grpcio
+grpcio-tools
+protobuf
