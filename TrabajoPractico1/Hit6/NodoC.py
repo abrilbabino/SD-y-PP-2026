@@ -97,7 +97,7 @@ def aceptarConn (server):
 
 def register (serverHost, serverPort, nodoHost, nodoPort):
 
-    url = f"http://{serverHost}:{serverPort}/register"
+    url = f"http://{serverHost}:{serverPort}/Hit6/register"
 
     payload = {
         "host": nodoHost,
