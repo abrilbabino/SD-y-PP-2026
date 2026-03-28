@@ -59,7 +59,7 @@ Esto garantiza:
 
 Los nodos C:
 1. Se registran en D
-2. Obtienen los nodos actuales
+2. Obtienen los nodos futuros (los pares que se inscribieron en la misma ventana)
 3. Se conectan vía TCP
 4. Intercambian mensajes en formato JSON
 

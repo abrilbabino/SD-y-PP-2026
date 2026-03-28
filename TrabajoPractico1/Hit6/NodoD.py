@@ -1,9 +1,9 @@
 import time
-from fastapi import FastAPI
+from fastapi import APIRouter
 from pydantic import BaseModel
 
 # creo una app para exponer los endpoint
-app = FastAPI()
+router1 = APIRouter()
 
 start_time = time.time()
 
@@ -13,7 +13,7 @@ class Nodo(BaseModel):
     host: str
     port: int
 
-@app.post("/register")
+@router1.post("/Hit6/register")
 def registrar_nodo(nodo: Nodo):
 
 
@@ -34,7 +34,7 @@ def registrar_nodo(nodo: Nodo):
 
     return {"nodosPares": nodosPares}
 
-@app.get("/health")
+@router1.get("/Hit6/health")
 def health():
     uptime = int(time.time() - start_time)
 
