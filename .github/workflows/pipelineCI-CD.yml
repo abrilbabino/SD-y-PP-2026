@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ "envConfig" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "envConfig" ]
+    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -59,6 +59,8 @@ jobs:
 
     - name: Run Gitleaks
       uses: gitleaks/gitleaks-action@v2
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Genera la build y hace el deploy, registra en un log si se buildeo OK.
   cd:

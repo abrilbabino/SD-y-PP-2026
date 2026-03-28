@@ -72,7 +72,7 @@ def registrar_nodo(nodo: Nodo):
         guardar_estado()
         
         # SOLO devuelve los actuales
-        return {"nodosPares": nodos_actuales}
+        return {"nodosPares": nodos_futuros}
 
 
 # -------------------------------
