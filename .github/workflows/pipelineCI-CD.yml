@@ -90,7 +90,7 @@ jobs:
   tp2-hit1:
     runs-on: ubuntu-latest
     needs: cd
-    if: contains(github.event.head_commit.modified, 'TrabajoPractico2/') || github.event_name == 'push'
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
