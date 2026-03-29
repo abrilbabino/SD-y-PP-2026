@@ -63,6 +63,29 @@ docker run --rm -p 5000:5000 \
 pytest -q
 ```
 
-## Cliente de Ejemplo
+## Crear y Subir Imagen del Task Service
 
-Ver `sample_client/client.py` para un ejemplo de cómo enviar requests.
+1. Construir la imagen:
+```bash
+cd sample_task_service
+docker build -t <tu_usuario>/servicio-tarea:latest .
+```
+
+2. Hacer login a Docker Hub:
+```bash
+docker login
+```
+
+3. Subir la imagen:
+```bash
+docker push <tu_usuario>/servicio-tarea:latest
+```
+
+4. En el cliente, usar:
+```json
+{
+  "image": "<tu_usuario>/servicio-tarea:latest",
+  "task": "sumar",
+  "params": {"a": 3, "b": 5}
+}
+```
