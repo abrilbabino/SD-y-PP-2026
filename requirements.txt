@@ -7,3 +7,4 @@ httpx
 grpcio
 grpcio-tools
 protobuf
+docker

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Remote Task Client</title>
+  <style>
+    body { font-family: Arial; margin: 40px; }
+    input, select, textarea { margin: 5px 0; width: 300px; }
+    button { margin-top: 10px; padding: 10px; }
+    pre { background: #f4f4f4; padding: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Ejecutar tarea remota</h2>
+
+<label>Imagen Docker:</label><br>
+<input id="image" value="juanbrero/servicio-tarea:1.0"><br>
+
+<label>Tarea:</label><br>
+<select id="task">
+  <option value="suma">suma</option>
+  <option value="multiplicacion">multiplicacion</option>
+  <option value="potencia">potencia</option>
+</select><br>
+
+<label>Parámetros (JSON):</label><br>
+<textarea id="params">
+{ "a": 2, "b": 3 }
+</textarea><br>
+
+<button onclick="ejecutar()">Ejecutar</button>
+
+<h3>Resultado</h3>
+<pre id="resultado">...</pre>
+
+<script>
+async function ejecutar() {
+  const image = document.getElementById("image").value;
+  const task = document.getElementById("task").value;
+  const params = JSON.parse(document.getElementById("params").value);
+
+  const res = await fetch("http://localhost:3000/getRemoteTask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      image: image,
+      task: task,
+      params: params
+    })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("resultado").textContent =
+    JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
