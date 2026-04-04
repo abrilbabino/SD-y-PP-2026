@@ -40,7 +40,8 @@ async function ejecutar() {
   const task = document.getElementById("task").value;
   const params = JSON.parse(document.getElementById("params").value);
 
-  const res = await fetch("http://localhost:3000/getRemoteTask", {
+  // const res = await fetch("http://localhost:3000/getRemoteTask", {
+  const res = await fetch("/getRemoteTask", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
