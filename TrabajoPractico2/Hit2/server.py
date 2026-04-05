@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, FastAPI
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import docker
@@ -9,8 +9,12 @@ import threading
 import heapq
 import uuid
 
+
 router2 = APIRouter()
 client = docker.from_env()
+
+app = FastAPI()
+app.include_router(router2)
 
 # ================================
 # CONFIG
