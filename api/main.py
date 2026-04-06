@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from TrabajoPractico1.Hit6.NodoD import router1
 from TrabajoPractico2.Hit1.server import router2
+from TrabajoPractico2.Hit2.server import router3
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -16,6 +17,7 @@ app.add_middleware(
 
 app.include_router(router1)
 app.include_router(router2)
+app.include_router(router3)
 
 
 @app.get("/")
