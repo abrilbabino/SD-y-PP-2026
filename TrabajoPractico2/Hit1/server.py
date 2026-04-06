@@ -38,7 +38,11 @@ class TaskRequest(BaseModel):
     task: str
     params: dict
 
-'''la idea es que cada vez que se recibe una solicitud para ejecutar una tarea, se levanta un nuevo contenedor con la imagen especificada, se le asigna un puerto dinámico, y se invoca el endpoint /execute del servicio dentro del contenedor para que ejecute la tarea con los parámetros dados. Luego se devuelve la respuesta al cliente y se detiene el contenedor para liberar recursos.'''
+'''la idea es que cada vez que se recibe una solicitud para ejecutar una tarea, se levanta un 
+nuevo contenedor con la imagen especificada, se le asigna un puerto dinámico, y se invoca el 
+endpoint /execute del servicio dentro del contenedor para que ejecute la tarea con los 
+parámetros dados. Luego se devuelve la respuesta al cliente y se detiene el contenedor para 
+liberar recursos.'''
 
 @router2.post("/getRemoteTask")
 def ejecutarTareaRemota(req: TaskRequest):
@@ -49,7 +53,7 @@ def ejecutarTareaRemota(req: TaskRequest):
     try:
         # descargar imagen (si no está local) o usarla si ya está descargada. Esto es necesario para poder levantar el contenedor con esa imagen.
         client.images.pull(req.image)
-       
+        print(client.images.list(name=req.image))
         # levantar contenedor con la imagen especificada, en modo detached (en segundo plano, seria el parametro -d en la terminal),
         # asignando un puerto dinámico para exponer el servicio que va a correr dentro del contenedor.
         # lo que hace es mapear el puerto 5000 del contenedor a un puerto aleatorio del host, que es el que se va a usar para comunicarse con el servicio dentro del contenedor.
@@ -64,7 +68,8 @@ def ejecutarTareaRemota(req: TaskRequest):
         # una vez que el contenedor esta levantado, se refresca el estado del contenedor para obtener la información actualizada,
         # incluyendo el puerto asignado dinámicamente. Esto es necesario porque el puerto se asigna en el momento de levantar el contenedor y no se conoce de antemano.
         container.reload()
-       
+        print(f"Container {container.id} started with image {req.image}, mapped port: {container.attrs['NetworkSettings']['Ports']}")
+
         # port = container.attrs['NetworkSettings']['Ports']['5000/tcp'][0]['HostPort']
         # # esperar a que el servicio esté listo
         time.sleep(2)
