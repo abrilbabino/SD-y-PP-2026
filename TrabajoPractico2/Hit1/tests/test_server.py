@@ -24,7 +24,7 @@ def test_server_getRemoteTask():
         mock_client.containers.run.return_value = mock_container
         
         # Mock requests.post para simular respuesta del servicio tarea
-        with patch('TrabajoPractico2.Hit3.server.requests.post') as mock_post:
+        with patch('TrabajoPractico2.Hit1.server.requests.post') as mock_post:
             mock_response = MagicMock()
             mock_response.json.return_value = {"result": 8}
             mock_post.return_value = mock_response
