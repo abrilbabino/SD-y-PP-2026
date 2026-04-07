@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from server import router4
 
 app = FastAPI()
+app.include_router(router4)
 
 # defino el modelo de datos para el request que se espera recibir en el endpoint /execute. Este modelo tiene dos campos:
 # task, que es una cadena que indica la tarea a ejecutar, y params, que es un diccionario con los parámetros necesarios para ejecutar la tarea.
