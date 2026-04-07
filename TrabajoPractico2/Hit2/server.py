@@ -27,7 +27,6 @@ else:
     log_event("WARNING", "Using local Docker auth")
 
 
-# MAX_WORKERS = int(os.environ.get("MAX_WORKERS", 4))
 MAX_WORKERS = 4
 
 task_queue = queue.Queue()

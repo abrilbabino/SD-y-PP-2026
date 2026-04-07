@@ -72,7 +72,6 @@ def ejecutarTareaRemota(req: TaskRequest):
         container.reload()
         log_event("INFO", f"Container {container.id} started with image {req.image}, mapped port: {container.attrs['NetworkSettings']['Ports']}")
         
-        # port = container.attrs['NetworkSettings']['Ports']['5000/tcp'][0]['HostPort']
         # # esperar a que el servicio esté listo
         time.sleep(2)
         port = None
@@ -97,15 +96,6 @@ def ejecutarTareaRemota(req: TaskRequest):
             },
             timeout=10
         )
-        # response= None
-        # for _ in range(20):
-        #     try:
-        #         response = requests.get(f"http://localhost:{port}/EjecutarTarea", timeout=1)
-        #         if response.status_code == 200:
-        #             break
-        #     except:
-        #         time.sleep(0.5)
-        
         
         # devuelve la respuesta al cliente original, por lo que el servidor actua como un intermedioario o una especie de proxy.
         return response.json()
