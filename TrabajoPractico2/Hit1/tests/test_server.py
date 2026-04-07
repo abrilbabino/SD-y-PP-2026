@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 import uvicorn
 from api.main import app
 from fastapi.testclient import TestClient
-from TrabajoPractico2.Hit3 import server
+from TrabajoPractico2.Hit1 import server
 
 def run_server():
     """Levanta el servidor FastAPI en un hilo"""
@@ -34,7 +34,7 @@ def test_server_getRemoteTask():
             
             # Hacer petición al endpoint
             response = client.post(
-                "/getRemoteTask3",
+                "/getRemoteTask",
                 json={
                     "image": "local/task-service:latest",
                     "task": "suma",
@@ -65,7 +65,7 @@ def test_server_invalid_request():
     
     # Enviar request inválido (faltan campos)
     response = client.post(
-        "/getRemoteTask3",
+        "/getRemoteTask",
         json={"invalid": "request"}
     )
     
@@ -80,7 +80,7 @@ def test_server_endpoint_exists():
     
     # Solo verificar que el endpoint responde (aunque sea con error)
     response = client.post(
-        "/getRemoteTask3",
+        "/getRemoteTask",
         json={"image": "test", "task": "test", "params": {}}
     )
     
