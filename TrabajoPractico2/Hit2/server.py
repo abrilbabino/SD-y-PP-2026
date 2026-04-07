@@ -7,6 +7,8 @@ import time
 import os
 import threading
 import queue
+from ..common.logger import log_event
+
 
 router3 = APIRouter()
 
@@ -18,11 +20,11 @@ username = os.environ.get("DOCKER_HUB_USERNAME")
 if token and username:
     try:
         client.login(username=username, password=token)
-        print("Docker Hub login successful")
+        log_event("INFO", "Docker Hub login successful")
     except Exception as e:
-        print(f"Docker Hub login failed: {e}")
+        log_event("ERROR", f"Docker Hub login failed: {e}")
 else:
-    print("Using local Docker auth")
+    log_event("WARNING", "Using local Docker auth")
 
 
 # MAX_WORKERS = int(os.environ.get("MAX_WORKERS", 4))
@@ -56,6 +58,7 @@ def ejecutar_task(task):
 
     try:
         client.images.pull(req.image)
+        log_event("INFO", f"Image pulled: {req.image}")
 
         container = client.containers.run(
             req.image,
