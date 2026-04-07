@@ -6,6 +6,7 @@ import requests
 import time
 import os 
 import threading
+from ..common.logger import log_event
 
 router4 = APIRouter() 
 # creo un cliente que interactua con el daemon de docker local (debe estar corriendo). 
@@ -13,7 +14,7 @@ router4 = APIRouter()
 try:
     client = docker.from_env()
 except Exception as e:
-    print(f"Advertencia: No se pudo conectar a Docker: {e}")
+    log_event("ERROR", f"No se pudo conectar a Docker: {e}")
     client = None
 
 # Autenticación Docker Hub si hay credenciales 
@@ -24,13 +25,13 @@ username = os.environ.get("DOCKER_HUB_USERNAME")
 if token and username:
     try: 
         client.login(username=username, password=token)
-        print("Docker Hub login successful") 
+        log_event("INFO", "Docker Hub login successful")
         
     except Exception as e:
-        print(f"Docker Hub login failed: {e}")
+        log_event("ERROR", f"Docker Hub login failed: {e}")
         
 else: 
-    print("No Docker Hub credentials provided, using local auth")
+    log_event("INFO", "No Docker Hub credentials provided, using local auth")
     
 
 # esto es un modelo de datos que define la estructura del request que se espera recibir en el endpoint.
@@ -92,7 +93,7 @@ def elegir_lider():
             # Si el worker en la lista es yo mismo, asignarme como líder sin hacer GET
             if w["id"] == worker_id:
                 leader_id = w["id"]
-                print(f"[Elección] Yo soy el líder (Worker {leader_id})")
+                log_event("INFO", f"[Elección] Yo soy el líder (Worker {leader_id})")
                 # Notificar a todos los workers el nuevo líder
                 notificar_lider(leader_id)
                 return leader_id
@@ -100,15 +101,15 @@ def elegir_lider():
             r = requests.get(f"{w['url']}/status", timeout=2)
             if r.status_code == 200:
                 leader_id = w["id"]
-                print(f"[Elección] Líder elegido: Worker {leader_id}")
+                log_event("INFO", f"[Elección] Líder elegido: Worker {leader_id}")
                 # Notificar a todos los workers el nuevo líder
                 notificar_lider(leader_id)
                 return leader_id
         except Exception as e:
-            print(f"[Elección] No se pudo contactar a {w['url']}: {e}")
+            log_event("ERROR", f"[Elección] No se pudo contactar a {w['url']}: {e}")
             continue
 
-    print(f"[Elección] No se pudo elegir un líder")
+    log_event("ERROR", f"[Elección] No se pudo elegir un líder")
     return None
 
 
@@ -174,7 +175,7 @@ def coordinador(data: dict):
     new_leader = data.get("leader")
     if new_leader is not None:
         leader_id = new_leader
-        print(f"[Coordinador] Líder actualizado a: {new_leader}")
+        log_event("INFO", f"[Coordinador] Líder actualizado a: {new_leader}")
     return {"status": "ok", "leader_id": leader_id}
 
 
@@ -214,7 +215,7 @@ def asignar_tarea(req: TaskRequest):
         return r.json()
 
     except Exception as e:
-        print("Error reenviando al líder:", e)
+        log_event("ERROR", f"Error reenviando al líder: {e}")
         raise HTTPException(status_code=503, detail="Error al comunicarse con el líder")
 
 @router4.post("/getRemoteTask3")
@@ -305,13 +306,13 @@ def test():
 
 def monitor_lider():
     global leader_id
-    print(f"[Monitor] Iniciado para worker {worker_id}")
+    log_event("INFO", f"[Monitor] Iniciado para worker {worker_id}")
     time.sleep(5)
     while True:
-        print(f"[Monitor] Verificando líder actual: {leader_id}")
+        log_event("INFO", f"[Monitor] Verificando líder actual: {leader_id}")
 
         if leader_id is None:
-            print("[Monitor] Sin líder, iniciando elección...")
+            log_event("INFO", f"[Monitor] Sin líder, iniciando elección...")
             elegir_lider()
 
         elif leader_id != worker_id:
@@ -320,14 +321,14 @@ def monitor_lider():
                 try:
                     r = requests.get(f"{leader['url']}/status", timeout=2)
                     if r.status_code != 200:
-                        print("[Monitor] Líder no responde, iniciando elección...")
+                        log_event("INFO", f"[Monitor] Líder no responde, iniciando elección...")
                         elegir_lider()
                 except Exception as e:
-                    print(f"[Monitor] Error al contactar líder: {e}")
+                    log_event("ERROR", f"[Monitor] Error al contactar líder: {e}")
                     elegir_lider()
 
         else:
-            print("[Monitor] Soy el líder, sistema estable")
+            log_event("INFO", f"[Monitor] Soy el líder, sistema estable")
         
         time.sleep(5)
 
