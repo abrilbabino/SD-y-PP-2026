@@ -1,7 +1,6 @@
 # Hit1 - Ejecución Remota de Tareas en Contenedores Docker
 
 ## Descripción General
-
 Este proyecto implementa un sistema distribuido que permite ejecutar tareas remotas dentro de contenedores Docker bajo demanda. La arquitectura comprende dos componentes principales:
 
 1. **Servidor Principal** (`server.py`): Orquestador que levanta contenedores dinámicamente para ejecutar tareas
@@ -19,12 +18,26 @@ El sistema permite una escalabilidad eficiente al crear instancias de contenedor
 - **Docker** instalado y corriendo (daemon activo)
 - **pip** para instalar dependencias Python
 
+### Crear archivo `.env`**
+Crear un archivo `.env` con la siguiente configuración:
+
+```
+DOCKER_HUB_TOKEN = Token de acceso personal generado en la cuenta de Docker Hub.
+```
+Donde:
+- **DOCKER_HUB_TOKEN** → Se utiliza como contraseña en el proceso de autenticación del cliente Docker, permite que la aplicación tenga permiso para ejecutar docker pull sobre las imágenes necesarias para crear los contenedores que ejecutan las tareas.
+
+```
+DOCKER_HUB_USERNAME = Nombre de usuario de la cuenta en Docker Hub.
+```
+
+Donde:
+- **DOCKER_HUB_USERNAME** →  Se utiliza para autenticarse contra el registro y permitir que el servidor pueda descargar imágenes privadas.
+---
+
 ### Instalación de Dependencias
 
 ```bash
-# Navegar a la carpeta del proyecto
-cd TrabajoPractico2/Hit1
-
 # Instalar dependencias del servidor principal
 pip install fastapi uvicorn docker requests pydantic
 
@@ -32,32 +45,13 @@ pip install fastapi uvicorn docker requests pydantic
 pip install -r requirements.txt
 ```
 
-### Construir la Imagen Docker
-
-La imagen Docker contiene el servicio de tarea que se ejecutará en los contenedores:
-
-```bash
-# Desde la carpeta Hit1
-docker build -t servicio-tarea:latest .
-```
-
-Verificar que la imagen se creó correctamente:
-
-```bash
-docker images | grep servicio-tarea
-```
-
-### Ejecutar el Servidor Principal    (VER, PORQUE EN REALIDAD SE LEVANTA EL API MAIN)
+### Ejecutar el Servidor Principal 
 
 ```bash
 # Opción 1: Con uvicorn directamente
-uvicorn server:router2 --host 0.0.0.0 --port 8000
-
-# Opción 2: Con Python (si tienes main.py que importa el router)
-python server.py
+uvicorn api.main:app --host 0.0.0.0 --port 3000
 ```
-
-El servidor estará disponible en `http://localhost:8000`
+El servidor estará disponible en `http://localhost:3000/test`
 
 ### Ejecutar una Tarea Remota
 
@@ -93,7 +87,15 @@ curl -X POST "http://localhost:8000/getRemoteTask" \
 **Respuesta esperada:**
 ```json
 {"result": 8}
-```
+```  
+
+```json
+{"result": 28}
+```  
+
+```json
+{"result": 256}
+```  
 
 ### Depuración
 
@@ -113,83 +115,7 @@ docker images
 ---
 
 ## Diagrama de Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         CLIENTE HTTP                             │
-│              (curl, Postman, navegador, etc)                     │
-└────────────────────────┬────────────────────────────────────────┘
-                         │
-                         │ POST /getRemoteTask
-                         │ {image, task, params}
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    SERVIDOR PRINCIPAL                            │
-│                    (server.py - localhost:8000)                  │
-│                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  1. Valida request (TaskRequest model)                    │ │
-│  │  2. Autentica con Docker Hub (si es necesario)            │ │
-│  │  3. Descarga/valida imagen Docker                         │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                         │                                        │
-│                         ▼                                        │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  4. Levanta contenedor con puerto dinámico mapeado         │ │
-│  │  5. Espera a que el servicio dentro esté listo (2s)        │ │
-│  │  6. Obtiene puerto asignado dinámicamente                  │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                         │                                        │
-│                         ▼                                        │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │  7. HTTP POST a http://localhost:{puerto}/EjecutarTarea   │ │
-│  │     con {task, params}                                     │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                         │                                        │
-└─────────────────────────┼────────────────────────────────────────┘
-                         │
-          ┌──────────────┴──────────────┐
-          │                             │
-          ▼                             ▼
-   ┌─────────────────┐         ┌──────────────────────┐
-   │ Docker Daemon   │         │ CONTENEDOR TEMPORAL  │
-   │ (en el host)    │────────▶│ (servicio_tarea.py) │
-   └─────────────────┘         │                      │
-                               │ Puerto: 5000 (interno)
-                               │ Puerto: XXXX (host)  │
-                               │                      │
-                               │ ┌──────────────────┐ │
-                               │ │ Servicio FastAPI │ │
-                               │ │ /EjecutarTarea   │ │
-                               │ │ - suma           │ │
-                               │ │ - multiplicación │ │
-                               │ │ - potencia       │ │
-                               │ └──────────────────┘ │
-                               └──────────────────────┘
-                                        │
-                                        ▼
-                               Devuelve resultado
-                               {"result": valor}
-                                        │
-(Contenedor se destruye automáticamente)│
-                                        │
-          ┌─────────────────────────────┘
-          │
-          ▼
-┌────────────────────────────┐
-│   SERVIDOR PRINCIPAL       │
-│   (procesa respuesta)      │
-└────────────────────────────┘
-          │
-          ▼
-      ┌────────┐
-      │ CLIENTE│
-      │Respuesta
-      │{result}
-      └────────┘
-```
-
+https://drive.google.com/file/d/1Ay3mVwRVHgSczJeYEBlt38s3qhZpKXjT/view?usp=sharing
 ---
 
 ## Decisiones de Diseño
