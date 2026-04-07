@@ -208,7 +208,7 @@ def asignar_tarea(req: TaskRequest):
         r = requests.post(
             f"{leader['url']}/asignar_tarea",
             json=req.model_dump(),
-            timeout=5
+            timeout=10
         )
 
         return r.json()
