@@ -5,6 +5,7 @@ import docker
 import requests 
 import time
 import os 
+from ..common.logger import log_event
 
 
 router2 = APIRouter() 
@@ -20,13 +21,13 @@ username = os.environ.get("DOCKER_HUB_USERNAME")
 if token and username:
     try: 
         client.login(username=username, password=token)
-        print("Docker Hub login successful") 
-        
+        log_event("INFO", "Docker Hub login successful")
+
     except Exception as e:
-        print(f"Docker Hub login failed: {e}")
+        log_event("ERROR", f"Docker Hub login failed: {e}")
         
 else: 
-    print("No Docker Hub credentials provided, using local auth")
+    log_event("WARNING", "No Docker Hub credentials provided, using local auth")
     
     
 # esto es un modelo de datos que define la estructura del request que se espera recibir en el endpoint.
@@ -53,7 +54,8 @@ def ejecutarTareaRemota(req: TaskRequest):
     try:
         # descargar imagen (si no está local) o usarla si ya está descargada. Esto es necesario para poder levantar el contenedor con esa imagen.
         client.images.pull(req.image)
-        print(client.images.list(name=req.image))
+        log_event("INFO", f"Image pulled: {req.image}")
+        
         # levantar contenedor con la imagen especificada, en modo detached (en segundo plano, seria el parametro -d en la terminal),
         # asignando un puerto dinámico para exponer el servicio que va a correr dentro del contenedor.
         # lo que hace es mapear el puerto 5000 del contenedor a un puerto aleatorio del host, que es el que se va a usar para comunicarse con el servicio dentro del contenedor.
@@ -68,8 +70,8 @@ def ejecutarTareaRemota(req: TaskRequest):
         # una vez que el contenedor esta levantado, se refresca el estado del contenedor para obtener la información actualizada,
         # incluyendo el puerto asignado dinámicamente. Esto es necesario porque el puerto se asigna en el momento de levantar el contenedor y no se conoce de antemano.
         container.reload()
-        print(f"Container {container.id} started with image {req.image}, mapped port: {container.attrs['NetworkSettings']['Ports']}")
-
+        log_event("INFO", f"Container {container.id} started with image {req.image}, mapped port: {container.attrs['NetworkSettings']['Ports']}")
+        
         # port = container.attrs['NetworkSettings']['Ports']['5000/tcp'][0]['HostPort']
         # # esperar a que el servicio esté listo
         time.sleep(2)
