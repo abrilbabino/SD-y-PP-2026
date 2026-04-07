@@ -207,3 +207,6 @@ https://drive.google.com/file/d/1Ay3mVwRVHgSczJeYEBlt38s3qhZpKXjT/view?usp=shari
                   ↓
 12. Contenedor se destruye automáticamente
 ```
+
+---
+
