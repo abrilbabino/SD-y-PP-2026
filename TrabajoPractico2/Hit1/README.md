@@ -38,9 +38,6 @@ Donde:
 ### Instalación de Dependencias
 
 ```bash
-# Navegar a la carpeta del proyecto
-cd TrabajoPractico2/Hit1
-
 # Instalar dependencias del servidor principal
 pip install fastapi uvicorn docker requests pydantic
 
