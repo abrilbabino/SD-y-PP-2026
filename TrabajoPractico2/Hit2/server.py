@@ -127,7 +127,8 @@ start_workers()
 @router3.post("/getRemoteTask2")
 def ejecutarTareaRemota(req: TaskRequest):
     log_event("INFO", f"Received task request: {req.task} with image {req.image}")
-    ts = increment_clock(req.timestamp)
+    # ts = increment_clock(req.timestamp)
+    ts = increment_clock(lamport_clock)
 
     task = {
         "req": req,
@@ -145,7 +146,7 @@ def ejecutarTareaRemota(req: TaskRequest):
         time.sleep(0.05)
 
     return {
-        "lamport_ts": increment_clock(),
+        "lamport_ts": ts,
         "result": task["result"]
     }
 
