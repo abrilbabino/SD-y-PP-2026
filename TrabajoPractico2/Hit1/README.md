@@ -9,10 +9,6 @@ Este proyecto implementa un sistema distribuido que permite ejecutar tareas remo
 El sistema permite una escalabilidad eficiente al crear instancias de contenedores solo cuando se necesitan, ejecutar la tarea solicitada y luego destruir el contenedor para liberar recursos.
 
 ---
-## Variables de entorno
-**DOCKER_HUB_TOKEN:** Token de acceso personal generado en la cuenta de Docker Hub. Se utiliza como contraseña en el proceso de autenticación del cliente Docker, permite que la aplicación tenga permiso para ejecutar docker pull sobre las imágenes necesarias para crear los contenedores que ejecutan las tareas.
-
-**DOCKER_HUB_USERNAME:** Nombre de usuario de la cuenta en Docker Hub. Se utiliza para autenticarse contra el registro y permitir que el servidor pueda descargar imágenes privadas.
 
 ## Instrucciones de Ejecución
 
@@ -21,6 +17,23 @@ El sistema permite una escalabilidad eficiente al crear instancias de contenedor
 - **Python 3.10+** instalado
 - **Docker** instalado y corriendo (daemon activo)
 - **pip** para instalar dependencias Python
+
+### Crear archivo `.env`**
+Crear un archivo `.env` con la siguiente configuración:
+
+```
+DOCKER_HUB_TOKEN = Token de acceso personal generado en la cuenta de Docker Hub.
+```
+Donde:
+- **DOCKER_HUB_TOKEN** → Se utiliza como contraseña en el proceso de autenticación del cliente Docker, permite que la aplicación tenga permiso para ejecutar docker pull sobre las imágenes necesarias para crear los contenedores que ejecutan las tareas.
+
+```
+DOCKER_HUB_USERNAME = Nombre de usuario de la cuenta en Docker Hub.
+```
+
+Donde:
+- **DOCKER_HUB_USERNAME** →  Se utiliza para autenticarse contra el registro y permitir que el servidor pueda descargar imágenes privadas.
+---
 
 ### Instalación de Dependencias
 
