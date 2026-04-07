@@ -100,7 +100,7 @@ def ejecutar_task(task):
             try:
                 container.stop()
 
-                print(f"[DONE] TS={task['timestamp']}")
+                log_event("INFO", f"[DONE] TS={task['timestamp']}")
             except:
                 pass
 
@@ -108,11 +108,11 @@ def ejecutar_task(task):
 def worker_loop(worker_id):
     while True:
         task = task_queue.get()
-        print(f"[WORKER {worker_id}] ejecutando TS={task['timestamp']}")
+        log_event("INFO", f"[WORKER {worker_id}] ejecutando TS={task['timestamp']}")
         try:
             ejecutar_task(task)
         except Exception as e:
-            print(f"Worker {worker_id} error: {e}")
+            log_event("ERROR", f"Worker {worker_id} error: {e}")
         finally:
             task_queue.task_done()
 
@@ -126,7 +126,7 @@ start_workers()
 
 @router3.post("/getRemoteTask2")
 def ejecutarTareaRemota(req: TaskRequest):
-    print("ENTRO AL HIT 2")
+    log_event("INFO", f"Received task request: {req.task} with image {req.image}")
     ts = increment_clock(req.timestamp)
 
     task = {
@@ -135,7 +135,7 @@ def ejecutarTareaRemota(req: TaskRequest):
         "result": None
     }
 
-    print(f"[ENQUEUE] TS={ts} task={req.task}")
+    log_event("INFO", f"[ENQUEUE] TS={ts} task={req.task}")
     with queue_lock:
         
         task_queue.put(task)
