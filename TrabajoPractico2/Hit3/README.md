@@ -14,8 +14,7 @@ El sistema consta de:
 
 ## Arquitectura
 
-link
-
+https://drive.google.com/file/d/1uvqh0JF8L7qvk4vmhDZ2V4BUAHH2jFCx/view?usp=sharing
 
 ## Inicio Rápido
 
