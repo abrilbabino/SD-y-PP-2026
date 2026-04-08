@@ -66,7 +66,7 @@ def ejecutar_task(task):
             remove=True
         )
 
-        time.sleep(2)
+        time.sleep(5)
 
         port = None
         for _ in range(10):
