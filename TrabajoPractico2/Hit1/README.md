@@ -57,27 +57,30 @@ El servidor estará disponible en `http://localhost:3000/test`
 
 ```bash
 # Ejemplo: Sumar dos números
-curl -X POST "http://localhost:8000/getRemoteTask" \
-  -H "Content-Type: application/json" \
-  -d '{
+Invoke-RestMethod -Uri "http://localhost:8000/getRemoteTask" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{
     "image": "servicio-tarea:latest",
     "task": "suma",
-    "params": {"a": 5, "b": 3}
+    "params": { "a": 5, "b": 3 }
   }'
 
 # Ejemplo: Multiplicación
-curl -X POST "http://localhost:8000/getRemoteTask" \
-  -H "Content-Type: application/json" \
-  -d '{
+Invoke-RestMethod -Uri "http://localhost:8000/getRemoteTask" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{
     "image": "servicio-tarea:latest",
     "task": "multiplicacion",
     "params": {"a": 4, "b": 7}
   }'
 
 # Ejemplo: Potencia
-curl -X POST "http://localhost:8000/getRemoteTask" \
-  -H "Content-Type: application/json" \
-  -d '{
+Invoke-RestMethod -Uri "http://localhost:8000/getRemoteTask" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{
     "image": "servicio-tarea:latest",
     "task": "potencia",
     "params": {"a": 2, "b": 8}

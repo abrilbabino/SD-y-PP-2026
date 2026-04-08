@@ -1,0 +1,62 @@
+version: "3"
+services:
+  # Primer worker
+  worker1:
+    build:
+      context: ../..
+      dockerfile: TrabajoPractico2/Hit3/Dockerfile
+    environment:
+      - WORKER_ID=1 # cada worker tiene un ID único
+    ports:
+      - "8001:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - backend
+
+  # Segundo worker
+  worker2:
+    build:
+      context: ../..
+      dockerfile: TrabajoPractico2/Hit3/Dockerfile
+    environment:
+      - WORKER_ID=2
+    ports:
+      - "8002:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - backend
+
+  # Tercer worker
+  worker3:
+    build:
+      context: ../..
+      dockerfile: TrabajoPractico2/Hit3/Dockerfile
+    environment:
+      - WORKER_ID=3
+    ports:
+      - "9000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - backend
+
+  # Balanceador de carga con Nginx
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "8080:80"
+    depends_on:
+      - worker1
+      - worker2
+      - worker3
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
