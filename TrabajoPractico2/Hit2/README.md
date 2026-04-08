@@ -39,8 +39,6 @@ Donde:
 ### Instalación de Dependencias
 
 ```bash
-# Navegar a la carpeta del proyecto
-cd TrabajoPractico2/Hit2
 
 # Instalar dependencias
 pip install fastapi uvicorn docker requests pydantic
@@ -55,14 +53,15 @@ pip install -r requirements.txt
 uvicorn api.main:app --host 0.0.0.0 --port 3000
 ```
 
-El servidor estará disponible en `http://localhost:3000`
+El servidor estará disponible en `http://localhost:3000/test2`
 
 ### Ejecutar una Tarea Remota
 
 ```bash
-curl -X POST "http://localhost:3000/getRemoteTask2" \
-  -H "Content-Type: application/json" \
-  -d '{
+Invoke-RestMethod -Uri "http://localhost:3000/getRemoteTask2" `
+  -Method POST `
+  -ContentType "application/json" `
+  -Body '{
     "image": "juanbrero/servicio-tarea:1.0",
     "task": "suma",
     "params": {"a": 1, "b": 2},
@@ -117,7 +116,7 @@ docker images
 ---
 
 ## Diagrama de Arquitectura
-LINK
+https://drive.google.com/file/d/1yloH2bh_1-BdwWuuAMBqqC3VL1foyzub/view?usp=sharing
 
 ## Reloj de Lamport
 
