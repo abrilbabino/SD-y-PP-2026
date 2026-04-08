@@ -6,7 +6,7 @@ import requests
 import time
 import os 
 import threading
-from ..common.logger import log_event
+from common.logger import log_event
 
 router4 = APIRouter() 
 # creo un cliente que interactua con el daemon de docker local (debe estar corriendo). 
@@ -309,8 +309,7 @@ def monitor_lider():
     log_event("INFO", f"[Monitor] Iniciado para worker {worker_id}")
     time.sleep(5)
     while True:
-        log_event("INFO", f"[Monitor] Verificando líder actual: {leader_id}")
-
+        #log_event("INFO", f"[Monitor] Verificando líder actual: {leader_id}")
         if leader_id is None:
             log_event("INFO", f"[Monitor] Sin líder, iniciando elección...")
             elegir_lider()
@@ -327,8 +326,8 @@ def monitor_lider():
                     log_event("ERROR", f"[Monitor] Error al contactar líder: {e}")
                     elegir_lider()
 
-        else:
-            log_event("INFO", f"[Monitor] Soy el líder, sistema estable")
+        #else:
+            #log_event("INFO", f"[Monitor] Soy el líder, sistema estable")
         
         time.sleep(5)
 
