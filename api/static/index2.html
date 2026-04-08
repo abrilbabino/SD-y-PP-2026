@@ -68,7 +68,10 @@ async function ejecutar() {
 
   const data = await res.json();
 
-  incrementClock(data.lamport_ts);
+  // Sincronizar sin incrementar
+  if (data.lamport_ts > lamportClock) {
+    lamportClock = data.lamport_ts;
+  }
 
   document.getElementById("resultado").textContent =
     JSON.stringify(data, null, 2);
