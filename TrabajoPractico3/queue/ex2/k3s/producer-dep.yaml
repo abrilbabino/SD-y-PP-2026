@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ex2-producer
+  labels:
+    app: ex2-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ex2-producer
+  template:
+    metadata:
+      labels:
+        app: ex2-producer
+    spec:
+      containers:
+      - name: producer
+        image: app-ex2:latest
+        imagePullPolicy: Never
+        command: ["python", "/app/src/producer.py"]
+        env:
+        - name: RABBIT_HOST
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: RABBIT_HOST
+        - name: RABBIT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: RABBIT_USER
+        - name: RABBIT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: RABBIT_PASS
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        volumeMounts:
+        - name: app-logs
+          mountPath: /var/log
+      volumes:
+      - name: app-logs
+        emptyDir: {}
