@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rabbitmq-producer
+  namespace: default
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-producer
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: producer
+          image: rabbitmq-producer:ex1
+          imagePullPolicy: Never
+          env:
+            - name: RABBITMQ_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-config
+                  key: RABBITMQ_URL

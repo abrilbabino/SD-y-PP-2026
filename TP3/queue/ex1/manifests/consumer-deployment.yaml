@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-consumer
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq-consumer
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-consumer
+    spec:
+      containers:
+        - name: consumer
+          image: rabbitmq-consumer:ex1
+          imagePullPolicy: Never
+          env:
+            - name: RABBITMQ_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: rabbitmq-config
+                  key: RABBITMQ_URL
+            - name: CONSUMER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PROCESSING_SECONDS
+              value: "1"
