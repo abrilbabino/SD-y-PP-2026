@@ -22,9 +22,15 @@ spec:
         - containerPort: 15672
         env:
         - name: RABBITMQ_DEFAULT_USER
-          value: "guest"
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: RABBIT_USER
         - name: RABBITMQ_DEFAULT_PASS
-          value: "guest"
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: RABBIT_PASS
 ---
 apiVersion: v1
 kind: Service

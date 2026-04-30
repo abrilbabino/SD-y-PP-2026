@@ -22,8 +22,8 @@ spec:
         env:
         - name: RABBIT_HOST
           valueFrom:
-            secretKeyRef:
-              name: rabbit-credentials
+            configMapKeyRef:
+              name: rabbit-config
               key: RABBIT_HOST
         - name: RABBIT_USER
           valueFrom:
