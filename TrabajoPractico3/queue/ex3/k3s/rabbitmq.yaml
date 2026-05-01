@@ -1,39 +1,42 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: rabbitmq-secret
+  name: rabbitmq-secret-ex3
   namespace: default
 type: Opaque
 stringData:
   RABBITMQ_USER: tp3
   RABBITMQ_PASS: tp3
 ---
-#configuracion no sensible
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: rabbitmq-config
+  name: rabbitmq-config-ex3
   namespace: default
 data:
-  RABBIT_HOST: rabbitmq
+  RABBITMQ_HOST: rabbitmq-ex3
   RABBITMQ_PORT: "5672"
-  QUEUE_NAME: task_queue
+  MAIN_EXCHANGE: main_exchange
+  MAIN_QUEUE: main_queue
+  MAIN_ROUTING_KEY: tasks
+  DLX_EXCHANGE: dlx_exchange
+  DEAD_LETTER_QUEUE: dead_letter_queue
+  DLQ_ROUTING_KEY: dead
 ---
-#Corre un contenedor de rabbitMQ con su panel de adm
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rabbitmq
+  name: rabbitmq-ex3
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rabbitmq
+      app: rabbitmq-ex3
   template:
     metadata:
       labels:
-        app: rabbitmq
+        app: rabbitmq-ex3
     spec:
       containers:
         - name: rabbitmq
@@ -43,12 +46,12 @@ spec:
             - name: RABBITMQ_DEFAULT_USER
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret
+                  name: rabbitmq-secret-ex3
                   key: RABBITMQ_USER
             - name: RABBITMQ_DEFAULT_PASS
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret
+                  name: rabbitmq-secret-ex3
                   key: RABBITMQ_PASS
           ports:
             - name: amqp
@@ -56,16 +59,15 @@ spec:
             - name: management
               containerPort: 15672
 ---
-#expone rabbitMQ dentro del cluster
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq
+  name: rabbitmq-ex3
   namespace: default
 spec:
   type: ClusterIP
   selector:
-    app: rabbitmq
+    app: rabbitmq-ex3
   ports:
     - name: amqp
       port: 5672
