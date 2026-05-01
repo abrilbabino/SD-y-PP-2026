@@ -76,3 +76,11 @@ Para correr los tests unitarios:
 ```bash
 python queue/ex2/tests/test_ex2.py
 ```
+Para ver el endpoint health del producer:
+```bash
+kubectl port-forward deployment/ex2-producer 8080:8080
+```
+Para ver el el endpoint health de un worker:
+```bash
+kubectl port-forward deployment/ex2-worker 8081:8080
+```
