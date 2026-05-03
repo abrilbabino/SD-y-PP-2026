@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-ex4
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-ex4
+  template:
+    metadata:
+      labels:
+        app: consumer-ex4
+    spec:
+      containers:
+        - name: consumer
+          image: app-ex4:latest
+          imagePullPolicy: Never
+          env:
+            - name: APP_ROLE
+              value: consumer
+            - name: HEALTH_PORT
+              value: "8081"
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret-ex4
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-secret-ex4
+                  key: RABBITMQ_PASS
+          envFrom:
+            - configMapRef:
+                name: rabbitmq-config-ex4
+          ports:
+            - name: health
+              containerPort: 8081
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 20
