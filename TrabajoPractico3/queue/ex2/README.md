@@ -25,6 +25,18 @@ Al enlazar (`bind`) esta cola temporal única al exchange `fanout`, cada worker 
 
 ## Instrucciones de Despliegue (K3s)
 
+### Configuración Inicial
+
+El proyecto depende de variables de entorno para las credenciales de RabbitMQ. Antes de comenzar, debes ejecutar el siguiente comando para crear tu archivo de configuración:
+
+```bash
+cp .env.example .env
+```
+
+Luego de copiar el archivo, ábrelo y completa los datos necesarios. Este archivo `.env` es el que utiliza el comando `kubectl create secret generic rabbit-credentials --from-env-file=.env` que aparece más adelante en el documento, garantizando así que el cluster tenga las credenciales necesarias.
+
+### Despliegue
+
 1. Construye la imagen Docker localmente. Asegúrate de ejecutar el comando desde la **raíz absoluta del proyecto** (`SD-y-PP-2026/`) para tener acceso al `requirements.txt`:
    ```bash
    docker build -f TrabajoPractico3/queue/ex2/Dockerfile -t app-ex2:latest .
