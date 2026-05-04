@@ -5,40 +5,22 @@ Este ejemplo implementa el patron **Retry con Exponential Backoff** usando Rabbi
 El delay se implementa sin plugins externos: el consumidor publica el mensaje fallido en `retry_queue` con la propiedad AMQP `expiration`. Cuando vence ese TTL, RabbitMQ lo mueve mediante DLX de vuelta a `main_exchange`, y el mensaje vuelve a entrar en `main_queue`.
 
 ## Arquitectura
+La solución se despliega en un cluster de Kubernetes (K3s local) e implementa el patrón Retry con Exponential Backoff utilizando una arquitectura de colas intermedias con TTL (Time-To-Live). Este diseño permite gestionar fallos transitorios de manera eficiente sin necesidad de plugins externos en RabbitMQ.  La arquitectura se compone de los siguientes elementos:
+- RabbitMQ: Gestiona tres exchanges (main, retry y dlx) para controlar el ciclo de vida del mensaje y sus reintentos.  
+- Producer: Envía mensajes iniciales a la main_queue a través del main_exchange.  
+- Consumer Principal: Intenta procesar los mensajes y simula fallos aleatorios con un 50% de probabilidad. Es el encargado de calcular el tiempo de espera y gestionar el contador de reintentos.  
+- Retry Queue: Una cola intermedia "de espera" donde los mensajes aguardan antes de volver a ser procesados.  
+- DLQ Consumer: Procesa los mensajes que han agotado el límite de 4 reintentos y han sido movidos a la dead_letter_queue.  
 
-```mermaid
-flowchart LR
-    P["Producer<br/>producer.py<br/>/health:8080"] --> E["main_exchange"]
-    E --> Q["main_queue"]
-    Q --> C["Consumer principal<br/>consumer.py<br/>fallo aleatorio 50%"]
-    C -- "ok: basic_ack" --> OK["Procesado"]
-    C -- "fallo intento 1..4<br/>TTL 1s,2s,4s,8s" --> RE["retry_exchange"]
-    RE --> RQ["retry_queue<br/>x-dead-letter-exchange=main_exchange"]
-    RQ -- "vence TTL" --> E
-    C -- "mas de 4 fallos" --> DLX["dlx_exchange"]
-    DLX --> DLQ["dead_letter_queue"]
-    DLQ --> DC["DLQ Consumer<br/>dlq_consumer.py<br/>/health:8082"]
-```
+## Mecanismo de Exponential Backoff
+El flujo de reintento utiliza las propiedades nativas de RabbitMQ para simular retrasos crecientes:  
+- Lógica de Reintento: Ante un fallo, el consumidor publica el mensaje en el retry_exchange en lugar de rechazarlo. El número de intento se registra en el encabezado x-retry-attempt.  
+- Espera Incremental (TTL): El mensaje se envía a la retry_queue con la propiedad expiration configurada según el intento actual: 1s, 2s, 4s u 8s.  
+- Expiración y Reenvío: La retry_queue tiene configurado un x-dead-letter-exchange que apunta de vuelta al main_exchange. Cuando el TTL del mensaje expira, RabbitMQ lo mueve automáticamente de regreso a la cola principal para un nuevo intento de procesamiento.  
+- Salida a DLQ: Si un mensaje alcanza los 4 reintentos fallidos, el consumidor lo envía al dlx_exchange para su almacenamiento definitivo en la dead_letter_queue, evitando bucles infinitos.  
 
-## Estructura
-
-```text
-TrabajoPractico3/queue/ex4/
-├── src/
-│   ├── producer.py
-│   ├── consumer.py
-│   └── dlq_consumer.py
-├── k3s/
-│   ├── rabbitmq.yaml
-│   ├── producer-dep.yaml
-│   ├── consumer-dep.yaml
-│   └── dlq-consumer-dep.yaml
-├── tests/
-│   └── test_integration.py
-├── Dockerfile
-├── .env.example
-└── README.md
-```
+## Diagrama de Arquitectura
+![Arquitectura-ex4](Arquitectura_ex4.png)
 
 ## Configuracion RabbitMQ
 

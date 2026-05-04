@@ -5,36 +5,21 @@ Este ejemplo implementa el patron **Dead Letter Queue (DLQ)** usando una **Dead 
 Este patron evita perder mensajes no procesables y permite analizarlos, reintentarlos o corregirlos fuera del flujo principal.
 
 ## Arquitectura
+La solución se despliega en un cluster de Kubernetes (K3s local) e implementa el patrón Dead Letter Queue (DLQ) utilizando un Dead Letter Exchange (DLX). Este diseño permite la gestión de mensajes fallidos sin interrumpir el flujo principal de la aplicación.  La arquitectura consta de los siguientes componentes:RabbitMQ: 
+- Broker de mensajería que gestiona dos exchanges y dos colas principales para el flujo de errores.  Producer: Un pod que publica mensajes en formato JSON hacia el main_exchange con la routing key tasks.  
+- Consumer Principal: Procesa los mensajes de la main_queue. Cuando detecta un mensaje con el campo "error": true, lo rechaza explícitamente.  
+- DLQ Consumer: Un consumidor dedicado que escucha exclusivamente la dead_letter_queue para procesar o auditar los mensajes que fallaron en el primer intento.  
 
-```mermaid
-flowchart LR
-    P["Producer<br/>producer.py<br/>/health:8080"] --> E["main_exchange"]
-    E --> Q["main_queue<br/>x-dead-letter-exchange=dlx_exchange"]
-    Q --> C["Consumer principal<br/>consumer.py<br/>ack o nack"]
-    C -- "basic_nack(requeue=false)" --> DLX["dlx_exchange"]
-    DLX --> DLQ["dead_letter_queue"]
-    DLQ --> DC["DLQ Consumer<br/>dlq_consumer.py<br/>/health:8082"]
-```
+## Patrón Dead Letter Exchange (DLX)
+Para evitar la pérdida de información y permitir el análisis de errores, se configura la siguiente lógica de reenvío automático:  
+- Configuración de la Cola Principal: La main_queue se declara con el argumento x-dead-letter-exchange apuntando a dlx_exchange y un x-dead-letter-routing-key configurado como dead.  
+- Mecanismo de Rechazo (Nack): El consumidor principal utiliza la instrucción basic_nack(requeue=False) al encontrar un mensaje con error. Al no ser reencolado en la cola original, RabbitMQ redirige el mensaje automáticamente al exchange de "letra muerta" (DLX).  
+- Redirección y Almacenamiento: El dlx_exchange (de tipo direct) recibe el mensaje rechazado y, basándose en la routing key dead, lo deposita en la dead_letter_queue.  
+- Persistencia de Errores: Este patrón asegura que cualquier mensaje no procesable sea capturado en una cola de soporte, donde el DLQ Consumer puede imprimir los fallos para su posterior corrección o reintento manual.  
 
-## Estructura
+## Diagrama de Arquitectura
 
-```text
-TrabajoPractico3/queue/ex3/
-├── src/
-│   ├── producer.py
-│   ├── consumer.py
-│   └── dlq_consumer.py
-├── k3s/
-│   ├── rabbitmq.yaml
-│   ├── producer-dep.yaml
-│   ├── consumer-dep.yaml
-│   └── dlq-consumer-dep.yaml
-├── tests/
-│   └── test_integration.py
-├── Dockerfile
-├── .env.example
-└── README.md
-```
+![Arquitectura-ex3](Arquitectura-ex3.png)
 
 ## Configuracion RabbitMQ
 

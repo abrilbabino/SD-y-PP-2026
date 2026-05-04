@@ -3,31 +3,21 @@
 Este ejemplo implementa el patron **Work Queue** o **Maestro/Esclavo**. Un productor publica 10 tareas en la cola `task_queue` y uno o mas workers las consumen. Al escalar el Deployment de workers a 2 replicas se puede observar el reparto round-robin de RabbitMQ.
 
 ## Arquitectura
+La solución se despliega en un cluster de Kubernetes (K3s local) y aplica el patrón de Work Queue (Cola de Trabajo) para la distribución de tareas. Consta de los siguientes componentes:  
+- RabbitMQ: Broker de mensajería que actúa como intermediario, gestionando la cola persistente task_queue.  
+- Producer: Un pod encargado de generar y enviar 10 tareas numeradas de forma secuencial a la cola.  
+- Workers (Consumidores): Un Deployment que puede escalarse dinámicamente. Cada réplica representa un consumidor que recibe, procesa e imprime las tareas.
 
-```mermaid
-flowchart LR
-    P["Producer Deployment<br/>producer.py<br/>/health:8080"] --> Q["RabbitMQ<br/>task_queue"]
-    Q --> W1["Worker Pod 1<br/>worker.py<br/>/health:8081"]
-    Q --> W2["Worker Pod 2<br/>worker.py<br/>/health:8081"]
-```
+## Patrón de Distribución Round-Robin
+El funcionamiento de la arquitectura se basa en la competencia entre consumidores para optimizar el procesamiento:  
+- Gestión de Cola Única: El sistema opera sobre una única cola (task_queue) donde los mensajes permanecen almacenados hasta que un trabajador está disponible para procesarlos.  
+- Reparto Equitativo: RabbitMQ implementa un algoritmo de Round-Robin para la entrega de mensajes. Esto significa que, cuando existen múltiples instancias de workers, el broker distribuye las tareas de manera cíclica entre ellos.  
+- Procesamiento Exclusivo: Cada mensaje es procesado por exactamente un consumidor. Una vez que un worker toma una tarea, esta ya no está disponible para los demás, evitando la duplicidad de esfuerzos.  
+- Escalabilidad Horizontal: Al aumentar el número de réplicas del worker (por ejemplo, a 2 o más), el sistema distribuye automáticamente la carga entre los nuevos recursos disponibles, permitiendo observar cómo RabbitMQ reparte los mensajes de forma balanceada.  
 
-## Estructura
+## Diagrama de Arquitectura
 
-```text
-TrabajoPractico3/queue/ex1/
-├── src/
-│   ├── producer.py
-│   └── worker.py
-├── k3s/
-│   ├── rabbitmq.yaml
-│   ├── producer-dep.yaml
-│   └── worker-dep.yaml
-├── tests/
-│   └── test_integration.py
-├── Dockerfile
-├── .env.example
-└── README.md
-```
+![Arquitectura-ex1](Arquitectura-ex1.png)
 
 ## Paso a paso de ejecucion
 

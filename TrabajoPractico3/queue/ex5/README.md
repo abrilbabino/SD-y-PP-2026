@@ -11,31 +11,36 @@ Este documento describe la arquitectura, diferencias y casos de uso de los patro
 Un productor envía mensajes a una cola y un solo consumidor los recibe. Es el modelo base para la distribución de carga.
 [Image of RabbitMQ Work Queue architecture with multiple consumers and round-robin distribution]
 
-- **Arquitectura:** `Producer -> Queue -> [Consumer 1, Consumer 2]`.
+- **Arquitectura:** 
+![Arquitectura-ex1](../ex1/Arquitectura-ex1.png)
+
 - **Comportamiento:** Implementamos un productor de 10 tareas. Al levantar 2 consumidores, observamos un reparto **Round-Robin** (mensajes 1, 3, 5... al Consumidor A y 2, 4, 6... al Consumidor B).
 
 ### EJEMPLO 2 — EVENT BUS / PUB-SUB (Fan-out)
 
 Se utiliza un `Exchange` de tipo `fanout`. El mensaje se ignora si no hay colas conectadas, o se copia a todas las colas suscritas.
-[Image of RabbitMQ Fanout Exchange architecture showing one producer and multiple queues receiving the same message]
 
-- **Arquitectura:** `Producer -> Fanout Exchange -> [Queue A, Queue B, Queue C]`.
+- **Arquitectura:** 
+![Arquitectura-ex2](../ex2/Arquitectura-ex2.png)
+
 - **Caso Nodos:** Se verificó que al emitir "nuevo bloque minado", los 3 nodos recibieron la copia exacta del evento simultáneamente.
 
 ### EJEMPLO 3 — DEAD LETTER QUEUE (DLQ)
 
 Mecanismo para capturar mensajes que fallan o son rechazados, evitando que bloqueen la cola principal o se pierdan.
-[Image of RabbitMQ Dead Letter Exchange architecture showing message redirection on rejection]
 
-- **Arquitectura:** `Main Queue (with DLX config) -> Consumer (nack) -> DLX -> Dead Letter Queue`.
+- **Arquitectura:** 
+![Arquitectura-ex3](../ex3/Arquitectura-ex3.png)
+
 - **Lógica:** El consumidor descarta mensajes con `"error": true`. Un segundo consumidor monitorea la DLQ para procesar los fallos.
 
 ### EJEMPLO 4 — RETRY CON EXPONENTIAL BACKOFF
 
 Estrategia de reintento para errores temporales, incrementando el tiempo de espera entre intentos.
-[Image of Exponential Backoff retry strategy flowchart in messaging systems]
 
-- **Arquitectura:** `Consumer -> Failure -> Wait (2^n) -> Re-queue -> DLQ (after 4 attempts)`.
+- **Arquitectura:** 
+![Arquitectura-ex4](../ex4/Arquitectura-ex4.png)
+
 - **Implementación:** Simulamos fallos del 50%. Los reintentos siguen la serie: 1s, 2s, 4s, 8s antes de rendirse y enviar a la DLQ.
 
 ---
@@ -61,11 +66,3 @@ Estrategia de reintento para errores temporales, incrementando el tiempo de espe
 4.  **Exponential Backoff:** En **Integraciones con APIs Externas** (ej. Stripe, AWS). Si el servicio externo devuelve un "Rate Limit", el backoff espera a que el servicio se recupere antes de intentar de nuevo, evitando saturar la red.
 
 ---
-
-## 4. Notas de Resiliencia (Ejercicio 2)
-
-Para garantizar la entrega en todos los patrones, se aplicó:
-
-- **Acknowledge (ack):** El mensaje no se borra de RabbitMQ hasta que el consumidor confirma éxito.
-- **Persistencia:** Colas y mensajes configurados como `durable` para resistir reinicios del broker.
-- **Prefetch Count:** Limitado a 1 para asegurar un despacho equitativo (Fair Dispatch).
