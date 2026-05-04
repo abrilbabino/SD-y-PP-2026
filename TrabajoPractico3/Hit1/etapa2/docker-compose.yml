@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  master:
+    build: .
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBIT_HOST=rabbitmq
+    # Montar la carpeta TrabajoPractico3 en /app
+    volumes:
+      - ../../:/app:rw
+    # working_dir debe apuntar a la ruta dentro del contenedor tras montar ../../ en /app
+    working_dir: /app/Hit1/etapa2
+    # Espera a que el script exista y a que rabbitmq acepte conexiones (timeout 120s),
+    # imprime poco mientras espera y luego ejecuta el master.
+    entrypoint: ["sh", "-c", "python3 - <<'PY'\nimport os, time, sys\ncandidates=['/app/Hit1/etapa2/master.py','/app/Hit1/etapa2/../master.py','/app/Hit1/master.py']\nstart=time.time()\nwhile not any(os.path.exists(p) for p in candidates):\n    if time.time()-start>120:\n        print('Timeout waiting for master script; exiting', file=sys.stderr); sys.exit(2)\n    if int(time.time()-start) % 10 == 0:\n        print('waiting for master script...')\n    time.sleep(2)\n# wait for rabbitmq to accept connections\nimport socket\nhost='rabbitmq'; port=5672\nstart=time.time()\nwhile True:\n    try:\n        s=socket.create_connection((host, port), timeout=1); s.close(); break\n    except Exception:\n        if time.time()-start>120:\n            print('Timeout waiting for rabbitmq; exiting', file=sys.stderr); sys.exit(3)\n        time.sleep(2)\nprint('ready')\nPY\nexec python3 /app/Hit1/etapa2/master.py --workers 4"]
+
+    restart: "no"
+
+  worker:
+    build: .
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBIT_HOST=rabbitmq
+    volumes:
+      - ../../:/app:rw
+    working_dir: /app/Hit1/etapa2
+    # Espera a que el script exista y a que rabbitmq acepte conexiones (timeout 120s),
+    # imprime poco mientras espera y luego ejecuta el worker.
+    entrypoint: ["sh", "-c", "python3 - <<'PY'\nimport os, time, sys\ncandidates=['/app/Hit1/etapa2/worker.py','/app/Hit1/etapa2/../worker.py','/app/Hit1/worker.py']\nstart=time.time()\nwhile not any(os.path.exists(p) for p in candidates):\n    if time.time()-start>120:\n        print('Timeout waiting for worker script; exiting', file=sys.stderr); sys.exit(2)\n    if int(time.time()-start) % 10 == 0:\n        print('waiting for worker script...')\n    time.sleep(2)\n# wait for rabbitmq\nimport socket\nhost='rabbitmq'; port=5672\nstart=time.time()\nwhile True:\n    try:\n        s=socket.create_connection((host, port), timeout=1); s.close(); break\n    except Exception:\n        if time.time()-start>120:\n            print('Timeout waiting for rabbitmq; exiting', file=sys.stderr); sys.exit(3)\n        time.sleep(2)\nprint('ready')\nPY\nexec python3 /app/Hit1/etapa2/worker.py"]
+
+    # scale this service: docker-compose up --build --scale worker=4
