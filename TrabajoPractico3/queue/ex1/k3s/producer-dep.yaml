@@ -27,27 +27,27 @@ spec:
             - name: RABBIT_HOST
               valueFrom:
                 configMapKeyRef:
-                  name: rabbitmq-config
+                  name: config-ex1
                   key: RABBIT_HOST
             - name: RABBITMQ_PORT
               valueFrom:
                 configMapKeyRef:
-                  name: rabbitmq-config
+                  name: config-ex1
                   key: RABBITMQ_PORT
             - name: QUEUE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: rabbitmq-config
+                  name: config-ex1
                   key: QUEUE_NAME
             - name: RABBITMQ_USER
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret
+                  name: rabbit-credentials-ex1
                   key: RABBITMQ_USER
             - name: RABBITMQ_PASS
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret
+                  name: rabbit-credentials-ex1
                   key: RABBITMQ_PASS
           readinessProbe:
             httpGet:
