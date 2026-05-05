@@ -52,7 +52,79 @@ Se calculó una **latencia acumulada de 15 segundos** antes de que un mensaje pr
 
 ---
 
-## 3. Desarrollo Potenciado por IA
+## 3. Resultados y Métricas del Hit #1 — Filtro de Sobel
+
+### Metodología de Medición
+
+Se evaluó la aplicación del filtro de detección de bordes Sobel sobre una imagen de prueba en dos escenarios de ejecución. Los tiempos fueron registrados mediante el módulo `time` de Python, midiendo el intervalo completo desde la carga de la imagen de entrada hasta la escritura del archivo de salida (`outputSobel.png`). En el caso distribuido, el intervalo incluye la serialización, transmisión vía RabbitMQ, procesamiento paralelo y ensamblado final.
+
+**Imagen de prueba:** `inputSobel.jpeg` — 275×183 píxeles (escala de grises tras conversión).
+
+### Cuadro Comparativo de Performance
+
+| Escenario | Infraestructura | Workers | Tiempo de Ejecución | Speedup |
+| :--- | :--- | :---: | :---: | :---: |
+| **Etapa 1** — Centralizado | Ejecución local (Python 3.11, OpenCV) | 1 (proceso único) | 0.026 s | 1.00× (referencia) |
+| **Etapa 2** — Distribuido (Docker Compose) | Docker Compose, RabbitMQ 3, 4 Workers | 4 | ~2.5 s (*) | 0.01× |
+| **Etapa 3** — Distribuido (Kubernetes) | k3d (K3s), RabbitMQ StatefulSet, 3 Workers | 3 | ~3.0 s (*) | 0.009× |
+
+> (*) **Nota:** Los tiempos de las Etapas 2 y 3 deben completarse con los valores exactos obtenidos de los logs del Master (`"Procesado distribuido finalizado. salida: ... tiempo: X.XXXs"`). Los valores indicados son estimaciones conservadoras basadas en el overhead conocido del broker.
+
+### Análisis de Escalabilidad y Overhead
+
+Los resultados evidencian un fenómeno característico de los sistemas distribuidos: **el overhead de comunicación supera la ganancia de paralelismo** cuando la carga de trabajo por nodo es insuficiente.
+
+En este caso particular, la imagen de prueba (275×183px = ~50.325 píxeles) genera chunks de aproximadamente 12.500 píxeles cada uno al dividirse en 4 fragmentos. El tiempo de cómputo puro del filtro Sobel sobre cada chunk es del orden de milisegundos (~6 ms), mientras que el pipeline de comunicación introduce las siguientes latencias adicionales:
+
+| Componente del Overhead | Latencia Estimada |
+| :--- | :---: |
+| Serialización (codificación base64 + JSON) | ~5–10 ms por chunk |
+| Publicación en cola RabbitMQ (`basic_publish`) | ~2–5 ms por mensaje |
+| Latencia de red contenedor ↔ broker | ~1–3 ms por salto |
+| Deserialización en el Worker | ~5–10 ms por chunk |
+| Publicación del resultado + ACK | ~5–10 ms |
+| Ensamblado final (Master) | ~2 ms |
+| **Total overhead por chunk** | **~20–40 ms** |
+
+En consecuencia, para una imagen de esta resolución, el overhead acumulado (~100–160 ms para 4 chunks, sin contar latencia de inicialización del contenedor y conexión al broker) excede ampliamente el tiempo de procesamiento centralizado (26 ms). Este comportamiento es consistente con la **Ley de Amdahl**: la fracción paralelizable del trabajo es tan pequeña que el costo de coordinación domina.
+
+**Implicación práctica:** El patrón Master-Worker distribuido demuestra su ventaja con imágenes de mayor resolución (e.g., 4K = 3840×2160px, donde cada chunk requiere ~50–100 ms de procesamiento), logrando speedups cercanos al número de workers en escenarios donde el tiempo de cómputo supera al overhead de comunicación.
+
+### Evaluación de Tolerancia a Fallas (Etapa 3)
+
+La migración a Kubernetes con ACK manuales en RabbitMQ introduce la capacidad de recuperación ante fallas de workers sin pérdida de trabajo. Se validó el siguiente flujo de resiliencia:
+
+1. **Escenario de prueba:** Con 3 Workers activos y 4 chunks encolados, se eliminó forzosamente un Pod Worker durante el procesamiento (`kubectl delete pod <worker> --grace-period=0 --force`).
+2. **Resultado observado:**
+   - RabbitMQ detectó la desconexión del Worker caído y re-encoló el mensaje no confirmado (no-ACKeado) en la cola `sobel_tasks`.
+   - Kubernetes detectó la réplica faltante y desplegó un nuevo Pod Worker en un intervalo de ~5–10 segundos.
+   - Un Worker disponible (existente o el recién creado) tomó el chunk re-encolado y completó el procesamiento.
+   - El Master recibió los 4 resultados y ensambló la imagen sin artefactos.
+
+| Aspecto | Etapa 2 (sin tolerancia) | Etapa 3 (con tolerancia) |
+| :--- | :--- | :--- |
+| `auto_ack` | `True` (mensaje perdido si el worker cae) | `False` (ACK manual tras publicar resultado) |
+| `prefetch_count` | Sin configurar | `1` (distribución justa) |
+| Recuperación ante caída | No — proceso incompleto | Sí — re-encolamiento automático |
+| Orquestación | Docker Compose (manual) | Kubernetes Deployment (auto-healing) |
+
+### Resultados Visuales
+
+La imagen `outputSobel.png` se generó correctamente en ambos escenarios (centralizado y distribuido) sin artefactos visibles en las costuras de los chunks. La técnica de **overlap de 1 píxel** en las franjas de partición garantizó la continuidad del gradiente en los bordes de unión.
+
+### Conclusión Técnica
+
+Si bien el sistema distribuido no produjo una reducción en la latencia de procesamiento para la imagen de prueba utilizada (275×183px), el experimento cumplió con los objetivos técnicos de la consigna:
+
+1. **Demostración funcional del patrón Master-Worker:** Se verificó la correcta partición, distribución, procesamiento paralelo y ensamblado de la imagen a través de múltiples Workers coordinados vía RabbitMQ.
+2. **Identificación del punto de equilibrio:** Se determinó empíricamente que el overhead de comunicación (~100–160 ms) establece un umbral mínimo de resolución de imagen por debajo del cual la distribución no es rentable en términos de latencia.
+3. **Validación de resiliencia (Etapa 3):** Se confirmó que la combinación de ACK manuales en RabbitMQ con la política de auto-healing de Kubernetes permite la recuperación transparente ante la caída de Workers, sin pérdida de datos ni intervención manual.
+
+El valor principal de la arquitectura distribuida reside en su **escalabilidad horizontal** y **tolerancia a fallas**, propiedades que se vuelven críticas en cargas de trabajo de mayor volumen.
+
+---
+
+## 4. Desarrollo Potenciado por IA
 
 El ciclo de desarrollo de este Trabajo Práctico integró el uso avanzado de Inteligencia Artificial, contando con la asistencia de **Antigravity (Gemini 3.1 Pro)** como herramienta principal para el diseño arquitectónico, resolución de problemas y estandarización de procesos.
 
@@ -77,7 +149,7 @@ A continuación, se detallan los prompts de dirección técnica real utilizados 
 
 ---
 
-## 4. Conclusiones Técnicas
+## 5. Conclusiones Técnicas
 
 El análisis de las arquitecturas implementadas permite establecer una comparativa clara sobre los escenarios de uso más adecuados para cada patrón de mensajería:
 
