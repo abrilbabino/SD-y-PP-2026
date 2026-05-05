@@ -63,22 +63,25 @@ Las credenciales van en `Secret`, no hardcodeadas en el codigo.
 
 ## Paso a paso de ejecucion
 
-Ubicarse en la raiz del proyecto:
+**Paso 1: Build desde la Raíz**
+Construir la imagen única posicionándose en la raíz del repositorio (`TrabajoPractico3/`). El `.` al final es fundamental para que Docker acceda al archivo `requirements.txt` ubicado en la raíz.
 
 ```bash
-cd TrabajoPractico3/queue/ex4/
+docker build -f TrabajoPractico3/queue/ex4/Dockerfile -t app-ex4:latest .
 ```
 
-Build de la imagen:
-
-```bash
-docker build -f Dockerfile -t app-ex4:latest .
-```
-
-Importar a k3d:
+**Paso 2: Importar Imagen**
+Importar la imagen local al cluster k3d `sobel`:
 
 ```bash
 k3d image import app-ex4:latest -c sobel
+```
+
+**Paso 3: Cambio de Directorio**
+Situarse en el directorio del ejercicio para aplicar los manifiestos:
+
+```bash
+cd TrabajoPractico3/queue/ex4/
 ```
 
 Desplegar:
