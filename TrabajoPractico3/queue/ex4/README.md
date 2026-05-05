@@ -170,7 +170,7 @@ FAILURE_PROBABILITY=0.5
 Ejecutar:
 
 ```bash
-python -m unittest tests/test_integration.py
+pytest
 ```
 
 ## Limpieza

@@ -153,7 +153,7 @@ def build_messages():
             {
                 "id": number,
                 "task": f"Tarea {number} de {TOTAL_MESSAGES}",
-                #"error": number in {3, 7, 10}, #linea que genera errores para probar DLX
+                "error": number in {3, 7, 10}, # linea que genera errores para probar DLX
             }
         )
     return messages
