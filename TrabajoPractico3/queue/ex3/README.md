@@ -152,7 +152,7 @@ RABBITMQ_PORT=5672
 Ejecutar:
 
 ```bash
-python -m unittest tests/test_integration.py
+pytest
 ```
 
 ## Limpieza

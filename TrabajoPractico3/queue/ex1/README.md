@@ -142,7 +142,7 @@ Los procesos escriben logs en:
 Ejecutar desde esta carpeta:
 
 ```bash
-python -m unittest tests/test_integration.py
+pytest
 ```
 
 ## Limpieza
