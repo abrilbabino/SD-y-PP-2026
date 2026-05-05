@@ -1,0 +1,1 @@
+[Video Explicación TP2](https://drive.google.com/file/d/1oS99ykjPCHSnbSdOHhW_8ShnLyIXeA-p/view?usp=sharing)
