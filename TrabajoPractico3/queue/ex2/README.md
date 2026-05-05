@@ -27,9 +27,10 @@ Al enlazar (`bind`) esta cola temporal única al exchange `fanout`, cada worker 
 
 ### Configuración Inicial
 
-El proyecto depende de variables de entorno para las credenciales de RabbitMQ. Antes de comenzar, debes ejecutar el siguiente comando para crear tu archivo de configuración:
+El proyecto depende de variables de entorno para las credenciales de RabbitMQ. Antes de comenzar, ubícate en el directorio del ejercicio y ejecuta el siguiente comando para crear tu archivo de configuración:
 
 ```bash
+cd TrabajoPractico3/queue/ex2
 cp .env.example .env
 ```
 
@@ -42,25 +43,20 @@ Luego de copiar el archivo, ábrelo y completa los datos necesarios. Este archiv
    docker build -f TrabajoPractico3/queue/ex2/Dockerfile -t app-ex2:latest .
    ```
 
-2. Cargar la imagen local en el cluster de k3d:
+2. Cargar la imagen local en el cluster de k3d. Este paso es crítico para que los nodos del cluster local puedan acceder a la imagen sin intentar descargarla de un registro externo como Docker Hub:
    ```bash
    k3d image import app-ex2:latest -c sobel
    ```
 
-3. Ubícate en el directorio `TrabajoPractico3/` y crea el Secret de Kubernetes con las credenciales (asegúrate de que exista el archivo `.env`):
+3. Ubícate en el directorio `TrabajoPractico3/queue/ex2/` y crea el Secret de Kubernetes con las credenciales (asegúrate de que exista el archivo `.env` local en esa carpeta):
    ```bash
-   cd TrabajoPractico3
+   cd TrabajoPractico3/queue/ex2
    kubectl create secret generic rabbit-credentials --from-env-file=.env
    ```
 
-4. Vuelve a la raíz o aplica los manifiestos directamente en el siguiente orden:
+4. Vuelve a la TrabajoPractico3 o aplica los manifiestos directamente:
    ```bash
-   kubectl apply -f queue/ex2/k3s/rabbitmq.yaml
-   
-   # Esperar unos segundos a que RabbitMQ esté listo
-   
-   kubectl apply -f queue/ex2/k3s/producer-dep.yaml
-   kubectl apply -f queue/ex2/k3s/worker-dep.yaml
+   kubectl apply -f k3s/
    ```
 
 5. Verifica que los pods estén corriendo:
@@ -96,3 +92,13 @@ Para ver el el endpoint health de un worker:
 ```bash
 kubectl port-forward deployment/ex2-worker 8081:8080
 ```
+
+## Limpieza
+
+Para eliminar todos los recursos creados en el cluster de Kubernetes para este ejercicio, ejecuta el siguiente comando:
+
+```bash
+kubectl delete -f k3s/
+```
+
+> **Nota:** Este comando eliminará el Deployment del Producer, el de los Workers y el Service de RabbitMQ, liberando los recursos del cluster para otros ejercicios.
