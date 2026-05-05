@@ -68,7 +68,7 @@ def get_rabbitmq_connection():
     raise Exception("No se pudo conectar a RabbitMQ después de varios intentos.")
 
 def callback(ch, method, properties, body):
-    logger.info(f"[x] Nodo recibió bloque: {body.decode('utf-8')}")
+    logger.info(f"[{os.getenv('WORKER_NAME')}] Nodo recibió bloque: {body.decode('utf-8')}")
 
 def main():
     # Iniciar endpoint healthcheck
