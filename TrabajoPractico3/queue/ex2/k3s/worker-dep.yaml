@@ -20,6 +20,10 @@ spec:
         imagePullPolicy: Never
         command: ["python", "/app/src/worker.py"]
         env:
+        - name: WORKER_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         - name: RABBIT_HOST
           valueFrom:
             configMapKeyRef:
