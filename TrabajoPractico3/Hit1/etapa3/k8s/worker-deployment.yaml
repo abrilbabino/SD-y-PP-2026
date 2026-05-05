@@ -1,9 +1,18 @@
+##############################################################
+# Sobel Worker — Deployment
+# K8s mantiene siempre 3 réplicas corriendo.
+# Si un Pod muere, el Deployment lo reemplaza automáticamente.
+# Combinado con auto_ack=False en el worker, RabbitMQ re-encola
+# el mensaje del Worker caído para que otro lo procese.
+##############################################################
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sobel-worker
+  labels:
+    app: sobel-worker
 spec:
-  replicas: 3               # ajustar replicas como estado deseado
+  replicas: 3
   selector:
     matchLabels:
       app: sobel-worker
@@ -14,13 +23,9 @@ spec:
     spec:
       containers:
         - name: worker
-          image: sobel:etapa3-local
-          imagePullPolicy: IfNotPresent
+          image: sobel-etapa3:latest
+          imagePullPolicy: Never          # imagen local (k3d / minikube)
+          command: ["python3", "worker.py"]
           env:
             - name: RABBIT_HOST
               value: "rabbitmq-service"
-          command: ["python3", "/app/etapa3/worker.py"]
-          resources:
-            limits:
-              cpu: "0.5"
-              memory: "512Mi"

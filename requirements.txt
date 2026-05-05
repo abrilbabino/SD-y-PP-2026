@@ -8,3 +8,5 @@ grpcio
 grpcio-tools
 protobuf
 docker
+opencv-python>=4.5
+numpy>=1.21

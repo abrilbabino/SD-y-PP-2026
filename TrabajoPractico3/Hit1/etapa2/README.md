@@ -1,13 +1,13 @@
 # Etapa 2 — Sobel (distribuido, Master-Worker con RabbitMQ)
 
-Arquitectura
+## Arquitectura
 - Master (container): lee `TrabajoPractico3/Hit1/inputSobel.jpeg`, lo divide en N chunks (splitter),
   publica cada chunk como tarea en la cola `sobel_tasks`.
 - Workers (cada uno en su contenedor): consumen de `sobel_tasks`, aplican Sobel al chunk y publican
   el resultado en `sobel_results`.
 - Master: consume `sobel_results` (joiner), espera N resultados, los une y escribe `etapa2/outputSobel.png`.
 
-IMPORTANTE — Sin tolerancia a fallos (Etapa 2)
+### IMPORTANTE — Sin tolerancia a fallos (Etapa 2)
 - En esta etapa NO se implementa tolerancia a fallos ni reintentos. Es decir:
   - Las colas y los mensajes no son persistentes.
   - Los consumidores se configuran con auto_ack=True; si un worker falla mientras procesa, ese trabajo se pierde.
@@ -15,14 +15,14 @@ IMPORTANTE — Sin tolerancia a fallos (Etapa 2)
 - Este diseño simplifica la implementación y permite enfocarse en el particionado, procesamiento distribuido y ensamblado
   sin manejar recuperación de errores.
 
-Comunicación
+## Comunicación
 - RabbitMQ actúa como broker. Se usan 2 colas (no durables en esta etapa):
   - sobel_tasks: tareas (chunk + metadatos).
   - sobel_results: resultados (chunk procesado + metadatos).
 - Ventajas en Etapa 2: separación de responsabilidades y escalado de workers.
 - Limitaciones en Etapa 2: no hay garantía de entrega ni tolerancia a fallos; considerar estas mejoras en la Etapa 3.
 
-Cómo probar con Docker Compose
+## Cómo probar con Docker Compose
 1. Colocar `inputSobel.jpeg` en `TrabajoPractico3/Hit1/` (una carpeta arriba de `etapa2`).
 2. Ir a la carpeta etapa2:
    cd TrabajoPractico3/Hit1/etapa2

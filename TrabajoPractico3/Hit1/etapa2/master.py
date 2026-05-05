@@ -7,7 +7,7 @@ import base64
 import argparse
 import logging
 from logging.handlers import RotatingFileHandler
-from threading import Event
+from threading import Event, Thread
 
 try:
     import cv2
@@ -168,18 +168,33 @@ def main():
         res_ch.basic_consume(queue=QUEUE_RESULTS, on_message_callback=on_result, auto_ack=True)
 
         logger.info("Esperando resultados...")
-        import threading
-        t = threading.Thread(target=res_ch.start_consuming, daemon=True)
-        t.start()
+        consumer_thread = Thread(target=res_ch.start_consuming, daemon=True)
+        consumer_thread.start()
 
         start = time.time()
         success = done_event.wait(timeout=300)
         elapsed = time.time() - start
 
-        if res_ch.is_open:
-            res_ch.stop_consuming()
-        res_conn.close()
-        conn.close()
+        try:
+            if res_ch.is_open:
+                res_ch.stop_consuming()
+        except Exception as e:
+            logger.warning("No se pudo detener el consumidor de resultados de forma limpia: %s", e)
+
+        if consumer_thread.is_alive():
+            consumer_thread.join(timeout=10)
+
+        if res_conn.is_open:
+            try:
+                res_conn.close()
+            except Exception as e:
+                logger.warning("Error cerrando la conexión de resultados: %s", e)
+
+        if conn.is_open:
+            try:
+                conn.close()
+            except Exception as e:
+                logger.warning("Error cerrando la conexión de tareas: %s", e)
 
         if not success or len(results) < n:
             logger.error("Error: solo se recibieron %d de %d resultados", len(results), n)

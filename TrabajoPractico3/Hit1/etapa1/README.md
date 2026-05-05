@@ -10,7 +10,7 @@ Prerequisitos
 
 Instalación (recomendado: pip)
 Desde la raíz del proyecto:
-  python3 -m pip install --user -r TrabajoPractico3/Hit1/etapa1/requirements.txt
+  python3 -m pip install --user -r requirements.txt
 
 O (Debian/Ubuntu) instalación por paquete del sistema:
   sudo apt update

@@ -14,7 +14,8 @@ services:
   master:
     build: .
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBIT_HOST=rabbitmq
     # Montar la carpeta TrabajoPractico3 en /app
@@ -31,7 +32,8 @@ services:
   worker:
     build: .
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       - RABBIT_HOST=rabbitmq
     volumes:
