@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sobel-worker
+spec:
+  replicas: 3               # ajustar replicas como estado deseado
+  selector:
+    matchLabels:
+      app: sobel-worker
+  template:
+    metadata:
+      labels:
+        app: sobel-worker
+    spec:
+      containers:
+        - name: worker
+          image: sobel:etapa3-local
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RABBIT_HOST
+              value: "rabbitmq-service"
+          command: ["python3", "/app/etapa3/worker.py"]
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"

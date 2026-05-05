@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sobel-master
+spec:
+  template:
+    spec:
+      containers:
+        - name: master
+          image: sobel:etapa3-local
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: RABBIT_HOST
+              value: "rabbitmq-service"
+          command: ["python3", "/app/etapa3/master.py", "--workers", "3"]
+          volumeMounts:
+            - name: host-hit1
+              mountPath: /app/etapa3/data
+      restartPolicy: Never
+      volumes:
+        - name: host-hit1
+          hostPath:
+            # Ajuste esta ruta si su proyecto está en otra ubicación en el host
+            path: /home/kali/Desktop/kubernetes/SD-y-PP-2026/TrabajoPractico3/Hit1
+            type: Directory
+  backoffLimit: 0
