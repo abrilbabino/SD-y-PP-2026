@@ -166,3 +166,12 @@ kubectl delete service rabbitmq-service
   y el ack, el resultado puede duplicarse, pero es idempotente (`results[cid]` se sobreescribe).
 - **`basic_nack(requeue=False)`**: Si un mensaje produce una excepción (ej: datos corruptos),
   se descarta sin re-encolarlo para evitar loops infinitos.
+
+## Pruebas (pytest)
+
+Para ejecutar los tests unitarios de la lógica distribuida (splitting, joining, etc.):
+
+1. Instalar pytest (si no está instalado):
+   `python3 -m pip install pytest`
+2. Ejecutar desde la raíz del proyecto:
+   `python3 -m pytest TrabajoPractico3/Hit1/etapa3/tests`
