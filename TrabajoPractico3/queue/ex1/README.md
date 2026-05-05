@@ -3,17 +3,21 @@
 Este ejemplo implementa el patron **Work Queue** o **Maestro/Esclavo**. Un productor publica 10 tareas en la cola `task_queue` y uno o mas workers las consumen. Al escalar el Deployment de workers a 2 replicas se puede observar el reparto round-robin de RabbitMQ.
 
 ## Arquitectura
-La solución se despliega en un cluster de Kubernetes (K3s local) y aplica el patrón de Work Queue (Cola de Trabajo) para la distribución de tareas. Consta de los siguientes componentes:  
-- RabbitMQ: Broker de mensajería que actúa como intermediario, gestionando la cola persistente task_queue.  
-- Producer: Un pod encargado de generar y enviar 10 tareas numeradas de forma secuencial a la cola.  
+
+La solución se despliega en un cluster de Kubernetes (K3s local) y aplica el patrón de Work Queue (Cola de Trabajo) para la distribución de tareas. Consta de los siguientes componentes:
+
+- RabbitMQ: Broker de mensajería que actúa como intermediario, gestionando la cola persistente task_queue.
+- Producer: Un pod encargado de generar y enviar 10 tareas numeradas de forma secuencial a la cola.
 - Workers (Consumidores): Un Deployment que puede escalarse dinámicamente. Cada réplica representa un consumidor que recibe, procesa e imprime las tareas.
 
 ## Patrón de Distribución Round-Robin
-El funcionamiento de la arquitectura se basa en la competencia entre consumidores para optimizar el procesamiento:  
-- Gestión de Cola Única: El sistema opera sobre una única cola (task_queue) donde los mensajes permanecen almacenados hasta que un trabajador está disponible para procesarlos.  
-- Reparto Equitativo: RabbitMQ implementa un algoritmo de Round-Robin para la entrega de mensajes. Esto significa que, cuando existen múltiples instancias de workers, el broker distribuye las tareas de manera cíclica entre ellos.  
-- Procesamiento Exclusivo: Cada mensaje es procesado por exactamente un consumidor. Una vez que un worker toma una tarea, esta ya no está disponible para los demás, evitando la duplicidad de esfuerzos.  
-- Escalabilidad Horizontal: Al aumentar el número de réplicas del worker (por ejemplo, a 2 o más), el sistema distribuye automáticamente la carga entre los nuevos recursos disponibles, permitiendo observar cómo RabbitMQ reparte los mensajes de forma balanceada.  
+
+El funcionamiento de la arquitectura se basa en la competencia entre consumidores para optimizar el procesamiento:
+
+- Gestión de Cola Única: El sistema opera sobre una única cola (task_queue) donde los mensajes permanecen almacenados hasta que un trabajador está disponible para procesarlos.
+- Reparto Equitativo: RabbitMQ implementa un algoritmo de Round-Robin para la entrega de mensajes. Esto significa que, cuando existen múltiples instancias de workers, el broker distribuye las tareas de manera cíclica entre ellos.
+- Procesamiento Exclusivo: Cada mensaje es procesado por exactamente un consumidor. Una vez que un worker toma una tarea, esta ya no está disponible para los demás, evitando la duplicidad de esfuerzos.
+- Escalabilidad Horizontal: Al aumentar el número de réplicas del worker (por ejemplo, a 2 o más), el sistema distribuye automáticamente la carga entre los nuevos recursos disponibles, permitiendo observar cómo RabbitMQ reparte los mensajes de forma balanceada.
 
 ## Diagrama de Arquitectura
 
@@ -36,15 +40,13 @@ k3d image import app-ex1:latest -c sobel
 ```
 
 **Paso 3: Cambio de Directorio**
-Situarse en el directorio del ejercicio para aplicar los manifiestos:
+Situarse en el directorio del ejercicio para crear los recursos de configuración y aplicar los manifiestos:
 
 ```bash
 cd TrabajoPractico3/queue/ex1/
-```
-
-Desplegar RabbitMQ, producer y worker:
-
-```bash
+cp .env.example .env
+# Completar los valores en el archivo .env si es necesario
+kubectl create secret generic rabbit-credentials-ex1 --from-env-file=.env
 kubectl apply -f k3s/
 ```
 
@@ -105,7 +107,31 @@ GET /health en puerto 8081
 Ambos devuelven:
 
 ```json
-{"servicio": "status"}
+{ "servicio": "status" }
+```
+
+Para ver el endpoint health del producer:
+
+```bash
+kubectl port-forward deployment/producer-deployment 8080:8080
+```
+
+En el buscador
+
+```bash
+http://localhost:8080/health
+```
+
+Para ver el el endpoint health de un worker:
+
+```bash
+kubectl port-forward deployment/worker-deployment 8081:8081
+```
+
+En el buscador
+
+```bash
+http://localhost:8081/health
 ```
 
 ## Variables de entorno
@@ -113,23 +139,13 @@ Ambos devuelven:
 Ver [.env.example](.env.example).
 
 ```bash
-RABBITMQ_USER=tp3
-RABBITMQ_PASS=tp3
-RABBIT_HOST=rabbitmq
-RABBITMQ_PORT=5672
-QUEUE_NAME=task_queue
+RABBITMQ_USER=tu-usuario
+RABBITMQ_PASS=tu-contraseña
 ```
 
-En Kubernetes, usuario y password se configuran mediante `Secret`. La configuracion externa de la aplicacion se maneja con el `ConfigMap` `rabbitmq-config`, definido en `k3s/rabbitmq.yaml`:
+En Kubernetes, las credenciales se generan de forma dinámica utilizando el archivo `.env` mediante un `Secret` (`rabbit-credentials-ex1`). El resto de la configuración no sensible se encuentra definida de forma declarativa en el archivo `k3s/configmap.yaml` bajo el nombre `config-ex1`.
 
-```yaml
-data:
-  RABBIT_HOST: rabbitmq
-  RABBITMQ_PORT: "5672"
-  QUEUE_NAME: task_queue
-```
-
-El producer y el worker leen `RABBIT_HOST` para conectarse al Service de RabbitMQ y `QUEUE_NAME` para declarar y consumir la cola.
+El producer y el worker leen las variables `RABBITMQ_USER` y `RABBITMQ_PASS` del Secret, y las variables como `RABBIT_HOST` y `QUEUE_NAME` del ConfigMap para conectarse al Service de RabbitMQ y declarar la cola.
 
 ## Logging
 
