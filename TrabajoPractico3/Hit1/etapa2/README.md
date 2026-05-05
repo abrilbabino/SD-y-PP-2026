@@ -38,7 +38,14 @@ Comandos alternativos (para ejecutar master local y solo los workers en docker)
    docker build -t sobel-worker .
    docker run -e RABBIT_HOST=host.docker.internal sobel-worker python3 worker.py
 3. Ejecutar master localmente:
-   RABBIT_HOST=localhost python3 master.py --workers 4
+    RABBIT_HOST=localhost python3 master.py --workers 4
+
+## Pruebas (pytest)
+Para ejecutar los tests unitarios de la lógica distribuida (splitting, joining, etc.):
+1. Instalar pytest (si no está instalado):
+   `python3 -m pip install pytest`
+2. Ejecutar desde la raíz del proyecto:
+   `python3 -m pytest TrabajoPractico3/Hit1/etapa2/tests/test_logic.py`
 
 Notas sobre RabbitMQ en este patrón
 - Usamos colas y basic_ack para el procesamiento, pero sin garantía de entrega.

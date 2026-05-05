@@ -2,19 +2,12 @@
 """
 Aplicación centralizada: toma TrabajoPractico3/Hit1/inputSobel.jpeg,
 aplica el filtro Sobel y escribe TrabajoPractico3/Hit1/etapa1/outputSobel.png.
-
-Ejecutar desde la raíz del proyecto:
-
-    (si falta alguna dependencia hacer):
-        sudo apt update
-        sudo apt install -y python3-opencv python3-numpy
-
-
-  python3 TrabajoPractico3/Hit1/etapa1/sobel.py
 """
 import os
 import sys
 import time
+import logging
+from logging.handlers import RotatingFileHandler
 
 # intentar importar OpenCV y dar instrucción clara si falta
 try:
@@ -30,6 +23,48 @@ except Exception:
 
 import numpy as np
 
+# --- LOGGING ---
+
+def setup_logger(name="sobel_central"):
+    """Configura logging estructurado hacia STDOUT y archivo rotativo."""
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.INFO)
+
+    if logger.handlers:
+        return logger
+
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(stream_handler)
+
+    log_file = os.getenv("LOG_FILE", "/var/log/ex4/sobel_central.log")
+    try:
+        os.makedirs(os.path.dirname(log_file), exist_ok=True)
+        file_handler = RotatingFileHandler(
+            log_file,
+            maxBytes=int(os.getenv("LOG_MAX_BYTES", "1048576")),
+            backupCount=int(os.getenv("LOG_BACKUP_COUNT", "3")),
+        )
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+    except (PermissionError, FileNotFoundError):
+        local_log = "sobel_central.log"
+        try:
+            file_handler = RotatingFileHandler(local_log, maxBytes=1048576, backupCount=3)
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
+            logger.warning("No se pudo escribir en %s, usando log local %s", log_file, local_log)
+        except Exception:
+            logger.warning("No se pudo escribir en archivos de log, continuando solo con stdout.")
+
+    return logger
+
+logger = setup_logger()
+
+# --- PROCESSING ---
 
 def apply_sobel_gray(img_gray: np.ndarray, ksize: int = 3) -> np.ndarray:
     # Calcular derivadas en X y Y (float64 para conservar rango)
@@ -52,27 +87,27 @@ def main():
     output_path = os.path.join(script_dir, "outputSobel.png")
 
     if not os.path.exists(input_path):
-        print(f"Error: no se encontró la imagen de entrada esperada:\n  {input_path}\n"
-              "Coloque inputSobel.jpeg dentro de la carpeta Hit1 (una carpeta arriba de etapa1).",
-              file=sys.stderr)
+        logger.error("Archivo de entrada no encontrado: %s", input_path)
         sys.exit(2)
 
     start = time.time()
     img = cv2.imread(input_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
-        print(f"Error: no se pudo leer la imagen (formato inválido o archivo corrupto):\n  {input_path}",
-              file=sys.stderr)
+        logger.error("No se pudo leer la imagen (formato inválido o archivo corrupto): %s", input_path)
         sys.exit(3)
 
+    logger.info("Aplicando filtro Sobel a la imagen...")
     result = apply_sobel_gray(img, ksize=3)
     ok = cv2.imwrite(output_path, result)
     elapsed = time.time() - start
 
     if not ok:
-        print(f"Error: no se pudo escribir el archivo de salida:\n  {output_path}", file=sys.stderr)
+        logger.error("No se pudo escribir el archivo de salida: %s", output_path)
         sys.exit(4)
 
-    print(f"Procesado exitoso:\n  entrada: {input_path}\n  salida:   {output_path}\n  tiempo: {elapsed:.3f}s")
+    logger.info("Procesado exitoso: tiempo %.3fs", elapsed)
+    logger.info("  entrada: %s", input_path)
+    logger.info("  salida:  %s", output_path)
 
 
 if __name__ == "__main__":

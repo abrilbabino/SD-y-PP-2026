@@ -22,7 +22,14 @@ Cómo probar / ejecutar
    (si no existe, crear la imagen ahi con ese nombre)
 
 2. Ejecuta desde la raíz del proyecto:
-   python3 TrabajoPractico3/Hit1/etapa1/sobel.py
+    python3 TrabajoPractico3/Hit1/etapa1/sobel.py
+
+## Pruebas (pytest)
+Para ejecutar los tests unitarios de la lógica de procesamiento:
+1. Instalar pytest (si no está instalado):
+   `python3 -m pip install pytest`
+2. Ejecutar desde la raíz del proyecto:
+   `python3 -m pytest TrabajoPractico3/Hit1/etapa1/test_sobel.py`
 
 Salida esperada
 - Archivo generado:
