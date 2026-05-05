@@ -38,26 +38,28 @@ Luego de copiar el archivo, ábrelo y completa los datos necesarios. Este archiv
 
 ### Despliegue
 
-1. Construye la imagen Docker localmente. Asegúrate de ejecutar el comando desde la **raíz absoluta del proyecto** (`SD-y-PP-2026/`) para tener acceso al `requirements.txt`:
-   ```bash
-   docker build -f TrabajoPractico3/queue/ex2/Dockerfile -t app-ex2:latest .
-   ```
+**Paso 1: Build desde la Raíz**
+Construir la imagen única posicionándose en la raíz del repositorio (`TrabajoPractico3/`). El `.` al final es fundamental para que Docker acceda al archivo `requirements.txt` ubicado en la raíz.
 
-2. Cargar la imagen local en el cluster de k3d. Este paso es crítico para que los nodos del cluster local puedan acceder a la imagen sin intentar descargarla de un registro externo como Docker Hub:
-   ```bash
-   k3d image import app-ex2:latest -c sobel
-   ```
+```bash
+docker build -f TrabajoPractico3/queue/ex2/Dockerfile -t app-ex2:latest .
+```
 
-3. Ubícate en el directorio `TrabajoPractico3/queue/ex2/` y crea el Secret de Kubernetes con las credenciales (asegúrate de que exista el archivo `.env` local en esa carpeta):
-   ```bash
-   cd TrabajoPractico3/queue/ex2
-   kubectl create secret generic rabbit-credentials --from-env-file=.env
-   ```
+**Paso 2: Importar Imagen**
+Importar la imagen local al cluster k3d `sobel`:
 
-4. Vuelve a la TrabajoPractico3 o aplica los manifiestos directamente:
-   ```bash
-   kubectl apply -f k3s/
-   ```
+```bash
+k3d image import app-ex2:latest -c sobel
+```
+
+**Paso 3: Cambio de Directorio**
+Situarse en el directorio del ejercicio para crear el Secret y aplicar los manifiestos:
+
+```bash
+cd TrabajoPractico3/queue/ex2/
+kubectl create secret generic rabbit-credentials --from-env-file=.env
+kubectl apply -f k3s/
+```
 
 5. Verifica que los pods estén corriendo:
    ```bash
