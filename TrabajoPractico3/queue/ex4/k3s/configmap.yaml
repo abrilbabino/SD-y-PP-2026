@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-ex4
+  namespace: default
+data:
+  RABBITMQ_HOST: "rabbitmq-ex4"
+  RABBITMQ_PORT: "5672"
+  MAIN_EXCHANGE: "main_exchange"
+  MAIN_QUEUE: "main_queue"
+  MAIN_ROUTING_KEY: "tasks"
+  RETRY_EXCHANGE: "retry_exchange"
+  RETRY_QUEUE: "retry_queue"
+  RETRY_ROUTING_KEY: "retry"
+  DLX_EXCHANGE: "dlx_exchange"
+  DEAD_LETTER_QUEUE: "dead_letter_queue"
+  DLQ_ROUTING_KEY: "dead"
+  FAILURE_PROBABILITY: "0.5"
