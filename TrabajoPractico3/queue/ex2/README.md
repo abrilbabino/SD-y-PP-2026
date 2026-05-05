@@ -82,7 +82,7 @@ Verás una salida similar a esta, donde cada línea proviene de una réplica dis
 ## Pruebas
 Para correr los tests unitarios:
 ```bash
-python queue/ex2/tests/test_ex2.py
+pytest
 ```
 Para ver el endpoint health del producer:
 ```bash
