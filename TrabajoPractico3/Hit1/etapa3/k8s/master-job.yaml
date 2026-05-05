@@ -1,0 +1,79 @@
+##############################################################
+# Sobel Master — Job
+# Ejecuta una vez: divide imagen, encola chunks, espera
+# resultados y ensambla la salida.
+# El initContainer espera a que RabbitMQ esté listo.
+# Se usa hostPath para acceder a la imagen de entrada/salida
+# en pruebas locales.
+##############################################################
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sobel-master
+  labels:
+    app: sobel-master
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: sobel-master
+    spec:
+      restartPolicy: OnFailure
+
+      # --- initContainer: espera a que RabbitMQ acepte conexiones ---
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: python:3.11-slim
+          command:
+            - sh
+            - -c
+            - |
+              pip install -q pika >/dev/null 2>&1
+              python3 -c "
+              import pika, time, sys
+              host = 'rabbitmq-service'
+              for i in range(60):
+                  try:
+                      conn = pika.BlockingConnection(pika.ConnectionParameters(host=host))
+                      conn.close()
+                      print(f'RabbitMQ ready on {host}')
+                      sys.exit(0)
+                  except Exception:
+                      print(f'Waiting for RabbitMQ ({i+1}/60)...')
+                      time.sleep(2)
+              print('Timeout waiting for RabbitMQ', file=sys.stderr)
+              sys.exit(1)
+              "
+
+      containers:
+        - name: master
+          image: sobel-etapa3:latest
+          imagePullPolicy: Never          # imagen local (k3d / minikube)
+          command:
+            - python3
+            - master.py
+            - --workers
+            - "4"
+            - --input
+            - /data/inputSobel.jpeg
+            - --output
+            - /data/outputSobel.png
+            - --rabbit
+            - rabbitmq-service
+          env:
+            - name: RABBIT_HOST
+              value: "rabbitmq-service"
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+
+      volumes:
+        - name: data-volume
+          hostPath:
+            # k3d: esta ruta es DENTRO del nodo k3d (contenedor Docker).
+            # Al crear el cluster, montamos la carpeta del host con:
+            #   k3d cluster create sobel --volume "C:\Users\Usuario\Documents\SD-Y-PP\SD-y-PP-2026\TrabajoPractico3\Hit1:/data/hit1"
+            # Eso hace que /data/hit1 dentro del nodo contenga inputSobel.jpeg.
+            path: /data/hit1
+            type: Directory
