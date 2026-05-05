@@ -48,3 +48,8 @@ Notas sobre RabbitMQ en este patrón
 Archivos importantes
 - master.py, worker.py, Dockerfile, docker-compose.yml, requirements.txt
 
+- Resultado de la ejecucion:
+<img width="567" height="139" alt="Imagen1" src="https://github.com/user-attachments/assets/b90613df-0704-4637-b2c8-4c03bf94ece0" />
+
+
+
