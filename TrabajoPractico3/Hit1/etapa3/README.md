@@ -23,12 +23,12 @@ Misma lógica de Etapa 2 (Master-Worker con RabbitMQ), con dos mejoras para tole
 
 ### Cambios respecto a Etapa 2
 
-| Aspecto | Etapa 2 | Etapa 3 |
-|---------|---------|---------|
-| `auto_ack` | `True` (mensaje se pierde si el worker cae) | `False` (ACK manual tras publicar resultado) |
-| `prefetch_count` | No configurado (sin límite) | `1` (un mensaje a la vez por worker) |
-| Orquestación | Docker Compose | Kubernetes (Deployment + Job + StatefulSet) |
-| Resiliencia | Ninguna | RabbitMQ re-encola + K8s reemplaza Pods |
+| Aspecto          | Etapa 2                                     | Etapa 3                                      |
+| ---------------- | ------------------------------------------- | -------------------------------------------- |
+| `auto_ack`       | `True` (mensaje se pierde si el worker cae) | `False` (ACK manual tras publicar resultado) |
+| `prefetch_count` | No configurado (sin límite)                 | `1` (un mensaje a la vez por worker)         |
+| Orquestación     | Docker Compose                              | Kubernetes (Deployment + Job + StatefulSet)  |
+| Resiliencia      | Ninguna                                     | RabbitMQ re-encola + K8s reemplaza Pods      |
 
 ## Archivos
 
@@ -57,7 +57,7 @@ etapa3/
 
 ```bash
 k3d cluster create sobel-hit1 \
-  --volume "C:\Users\Usuario\Documents\SD-Y-PP\SD-y-PP-2026\TrabajoPractico3\Hit1:/data/hit1@server:0"
+  --volume "TU-PATH\SD-y-PP-2026\TrabajoPractico3\Hit1:/data/hit1@server:0"
 ```
 
 > Esto monta la carpeta `Hit1` del host en `/data/hit1` dentro del nodo k3d.
