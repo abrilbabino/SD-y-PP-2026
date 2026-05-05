@@ -25,16 +25,16 @@ spec:
             - name: RABBITMQ_USER
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret-ex4
+                  name: rabbit-credentials-ex4
                   key: RABBITMQ_USER
             - name: RABBITMQ_PASS
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-secret-ex4
+                  name: rabbit-credentials-ex4
                   key: RABBITMQ_PASS
           envFrom:
             - configMapRef:
-                name: rabbitmq-config-ex4
+                name: config-ex4
           ports:
             - name: health
               containerPort: 8082

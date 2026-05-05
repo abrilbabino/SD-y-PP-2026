@@ -21,22 +21,25 @@ El funcionamiento de la arquitectura se basa en la competencia entre consumidore
 
 ## Paso a paso de ejecucion
 
-Situarse en la raiz del ejemplo:
+**Paso 1: Build desde la Raíz**
+Construir la imagen única posicionándose en la raíz del repositorio (`TrabajoPractico3/`). El `.` al final es fundamental para que Docker acceda al archivo `requirements.txt` ubicado en la raíz.
 
 ```bash
-cd TrabajoPractico3/queue/ex1/
+docker build -f TrabajoPractico3/queue/ex1/Dockerfile -t app-ex1:latest .
 ```
 
-Construir la imagen unica para producer y worker:
-
-```bash
-docker build -f Dockerfile -t app-ex1:latest .
-```
-
+**Paso 2: Importar Imagen**
 Importar la imagen local al cluster k3d `sobel`:
 
 ```bash
 k3d image import app-ex1:latest -c sobel
+```
+
+**Paso 3: Cambio de Directorio**
+Situarse en el directorio del ejercicio para aplicar los manifiestos:
+
+```bash
+cd TrabajoPractico3/queue/ex1/
 ```
 
 Desplegar RabbitMQ, producer y worker:

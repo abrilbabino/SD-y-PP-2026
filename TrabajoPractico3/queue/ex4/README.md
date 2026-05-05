@@ -5,21 +5,26 @@ Este ejemplo implementa el patron **Retry con Exponential Backoff** usando Rabbi
 El delay se implementa sin plugins externos: el consumidor publica el mensaje fallido en `retry_queue` con la propiedad AMQP `expiration`. Cuando vence ese TTL, RabbitMQ lo mueve mediante DLX de vuelta a `main_exchange`, y el mensaje vuelve a entrar en `main_queue`.
 
 ## Arquitectura
-La solución se despliega en un cluster de Kubernetes (K3s local) e implementa el patrón Retry con Exponential Backoff utilizando una arquitectura de colas intermedias con TTL (Time-To-Live). Este diseño permite gestionar fallos transitorios de manera eficiente sin necesidad de plugins externos en RabbitMQ.  La arquitectura se compone de los siguientes elementos:
-- RabbitMQ: Gestiona tres exchanges (main, retry y dlx) para controlar el ciclo de vida del mensaje y sus reintentos.  
-- Producer: Envía mensajes iniciales a la main_queue a través del main_exchange.  
-- Consumer Principal: Intenta procesar los mensajes y simula fallos aleatorios con un 50% de probabilidad. Es el encargado de calcular el tiempo de espera y gestionar el contador de reintentos.  
-- Retry Queue: Una cola intermedia "de espera" donde los mensajes aguardan antes de volver a ser procesados.  
-- DLQ Consumer: Procesa los mensajes que han agotado el límite de 4 reintentos y han sido movidos a la dead_letter_queue.  
+
+La solución se despliega en un cluster de Kubernetes (K3s local) e implementa el patrón Retry con Exponential Backoff utilizando una arquitectura de colas intermedias con TTL (Time-To-Live). Este diseño permite gestionar fallos transitorios de manera eficiente sin necesidad de plugins externos en RabbitMQ. La arquitectura se compone de los siguientes elementos:
+
+- RabbitMQ: Gestiona tres exchanges (main, retry y dlx) para controlar el ciclo de vida del mensaje y sus reintentos.
+- Producer: Envía mensajes iniciales a la main_queue a través del main_exchange.
+- Consumer Principal: Intenta procesar los mensajes y simula fallos aleatorios con un 50% de probabilidad. Es el encargado de calcular el tiempo de espera y gestionar el contador de reintentos.
+- Retry Queue: Una cola intermedia "de espera" donde los mensajes aguardan antes de volver a ser procesados.
+- DLQ Consumer: Procesa los mensajes que han agotado el límite de 4 reintentos y han sido movidos a la dead_letter_queue.
 
 ## Mecanismo de Exponential Backoff
-El flujo de reintento utiliza las propiedades nativas de RabbitMQ para simular retrasos crecientes:  
-- Lógica de Reintento: Ante un fallo, el consumidor publica el mensaje en el retry_exchange en lugar de rechazarlo. El número de intento se registra en el encabezado x-retry-attempt.  
-- Espera Incremental (TTL): El mensaje se envía a la retry_queue con la propiedad expiration configurada según el intento actual: 1s, 2s, 4s u 8s.  
-- Expiración y Reenvío: La retry_queue tiene configurado un x-dead-letter-exchange que apunta de vuelta al main_exchange. Cuando el TTL del mensaje expira, RabbitMQ lo mueve automáticamente de regreso a la cola principal para un nuevo intento de procesamiento.  
-- Salida a DLQ: Si un mensaje alcanza los 4 reintentos fallidos, el consumidor lo envía al dlx_exchange para su almacenamiento definitivo en la dead_letter_queue, evitando bucles infinitos.  
+
+El flujo de reintento utiliza las propiedades nativas de RabbitMQ para simular retrasos crecientes:
+
+- Lógica de Reintento: Ante un fallo, el consumidor publica el mensaje en el retry_exchange en lugar de rechazarlo. El número de intento se registra en el encabezado x-retry-attempt.
+- Espera Incremental (TTL): El mensaje se envía a la retry_queue con la propiedad expiration configurada según el intento actual: 1s, 2s, 4s u 8s.
+- Expiración y Reenvío: La retry_queue tiene configurado un x-dead-letter-exchange que apunta de vuelta al main_exchange. Cuando el TTL del mensaje expira, RabbitMQ lo mueve automáticamente de regreso a la cola principal para un nuevo intento de procesamiento.
+- Salida a DLQ: Si un mensaje alcanza los 4 reintentos fallidos, el consumidor lo envía al dlx_exchange para su almacenamiento definitivo en la dead_letter_queue, evitando bucles infinitos.
 
 ## Diagrama de Arquitectura
+
 ![Arquitectura-ex4](Arquitectura_ex4.png)
 
 ## Configuracion RabbitMQ
@@ -40,50 +45,34 @@ La topologia declarada por el codigo es:
 
 El intento actual viaja en el header `x-retry-attempt`. El body JSON original se mantiene sin modificar.
 
-## ConfigMap
+## ConfigMap y Secret
 
-El sistema maneja configuracion externa con el `ConfigMap` `rabbitmq-config-ex4`:
-
-```yaml
-data:
-  RABBITMQ_HOST: rabbitmq-ex4
-  RABBITMQ_PORT: "5672"
-  MAIN_EXCHANGE: main_exchange
-  MAIN_QUEUE: main_queue
-  MAIN_ROUTING_KEY: tasks
-  RETRY_EXCHANGE: retry_exchange
-  RETRY_QUEUE: retry_queue
-  RETRY_ROUTING_KEY: retry
-  DLX_EXCHANGE: dlx_exchange
-  DEAD_LETTER_QUEUE: dead_letter_queue
-  DLQ_ROUTING_KEY: dead
-```
-
-Las credenciales van en `Secret`, no hardcodeadas en el codigo.
+En Kubernetes, las credenciales se generan de forma dinámica utilizando el archivo `.env` mediante un `Secret` (`rabbit-credentials-ex4`). El resto de la configuración no sensible se encuentra definida de forma declarativa en el archivo `k3s/configmap.yaml` bajo el nombre `config-ex4`.
 
 ## Paso a paso de ejecucion
 
-Ubicarse en la raiz del proyecto:
+**Paso 1: Build desde la Raíz**
+Construir la imagen única posicionándose en la raíz del repositorio (`TrabajoPractico3/`). El `.` al final es fundamental para que Docker acceda al archivo `requirements.txt` ubicado en la raíz.
 
 ```bash
-cd TrabajoPractico3/queue/ex4/
+docker build -f TrabajoPractico3/queue/ex4/Dockerfile -t app-ex4:latest .
 ```
 
-Build de la imagen:
-
-```bash
-docker build -f Dockerfile -t app-ex4:latest .
-```
-
-Importar a k3d:
+**Paso 2: Importar Imagen**
+Importar la imagen local al cluster k3d `sobel`:
 
 ```bash
 k3d image import app-ex4:latest -c sobel
 ```
 
-Desplegar:
+**Paso 3: Cambio de Directorio**
+Situarse en el directorio del ejercicio para crear los recursos de configuración y aplicar los manifiestos:
 
 ```bash
+cd TrabajoPractico3/queue/ex4/
+cp .env.example .env
+# Completar los valores en el archivo .env si es necesario
+kubectl create secret generic rabbit-credentials-ex4 --from-env-file=.env
 kubectl apply -f k3s/
 ```
 
@@ -141,7 +130,43 @@ Mensaje recibido desde DLQ tras 4 reintentos
 Respuesta:
 
 ```json
-{"servicio": "status"}
+{ "servicio": "status" }
+```
+
+Para ver el endpoint health del producer:
+
+```bash
+kubectl port-forward deployment/producer-ex4 8080:8080
+```
+
+En el buscador
+
+```bash
+http://localhost:8080/health
+```
+
+Para ver el el endpoint health del consumer principal:
+
+```bash
+kubectl port-forward deployment/consumer-ex4 8081:8081
+```
+
+En el buscador
+
+```bash
+http://localhost:8081/health
+```
+
+Para ver el el endpoint health del dlq consumer:
+
+```bash
+kubectl port-forward deployment/dlq-consumer-ex4 8082:8082
+```
+
+En el buscador
+
+```bash
+http://localhost:8082/health
 ```
 
 ## Variables de entorno
@@ -149,20 +174,8 @@ Respuesta:
 Ver [.env.example](.env.example):
 
 ```bash
-RABBITMQ_USER=tp3
-RABBITMQ_PASS=tp3
-RABBITMQ_HOST=rabbitmq
-RABBITMQ_PORT=5672
-MAIN_EXCHANGE=main_exchange
-MAIN_QUEUE=main_queue
-MAIN_ROUTING_KEY=tasks
-RETRY_EXCHANGE=retry_exchange
-RETRY_QUEUE=retry_queue
-RETRY_ROUTING_KEY=retry
-DLX_EXCHANGE=dlx_exchange
-DEAD_LETTER_QUEUE=dead_letter_queue
-DLQ_ROUTING_KEY=dead
-FAILURE_PROBABILITY=0.5
+RABBITMQ_USER=tu-usuario
+RABBITMQ_PASS=tu-contraseña
 ```
 
 ## Tests
