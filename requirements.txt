@@ -10,3 +10,4 @@ protobuf
 docker
 opencv-python>=4.5
 numpy>=1.21
+pika==1.3.2

@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+        - name: worker
+          image: app-ex1:latest
+          imagePullPolicy: Never
+          command: ["python", "-u", "src/worker.py"]
+          ports:
+            - name: health
+              containerPort: 8081
+          env:
+            - name: HEALTH_PORT
+              value: "8081"
+            - name: WORKER_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PROCESSING_SECONDS
+              value: "1"
+            - name: RABBIT_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: config-ex1
+                  key: RABBIT_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: config-ex1
+                  key: RABBITMQ_PORT
+            - name: QUEUE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: config-ex1
+                  key: QUEUE_NAME
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-credentials-ex1
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-credentials-ex1
+                  key: RABBITMQ_PASS
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 20

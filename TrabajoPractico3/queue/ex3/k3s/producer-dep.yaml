@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer-ex3
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: producer-ex3
+  template:
+    metadata:
+      labels:
+        app: producer-ex3
+    spec:
+      containers:
+        - name: producer
+          image: app-ex3:latest
+          imagePullPolicy: Never
+          env:
+            - name: APP_ROLE
+              value: producer
+            - name: HEALTH_PORT
+              value: "8080"
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-credentials-ex3
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: rabbit-credentials-ex3
+                  key: RABBITMQ_PASS
+          envFrom:
+            - configMapRef:
+                name: config-ex3
+          ports:
+            - name: health
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 20
